@@ -1,0 +1,20 @@
+service Curie {
+	rpc SetGain(SetGainRequest) returns (GainStatus) {}
+}
+
+message SetGainRequest {
+	bool  isTX = 1;
+	int32 channel = 2;
+	float gain = 3;
+}
+
+message GetGainRequest {
+	bool  isTX = 1;
+	int32 channel = 2;
+}
+
+message GainStatus {
+	bool  isTX = 1;
+	int32 channel = 2;
+	float gain = 3;
+}
