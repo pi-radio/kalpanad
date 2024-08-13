@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "curiectl"
+version = "0.1.0"
+description = "Control Daemon for Curie FR3 SDR Transverter"
+authors = ["Pi Radio, Inc."]
+license = "BSD 3-Clause"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+click = "^8.1.7"
+grpcio = "^1.65.1"
+panel = "^1.4.5"
+
+
+[tool.poetry.group.dev.dependencies]
+grpcio-tools = "^1.65.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
