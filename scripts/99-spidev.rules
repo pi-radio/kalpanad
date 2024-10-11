@@ -1,0 +1,1 @@
+KERNEL=="spidev1.*", MODE="0660", GROUP="spi"

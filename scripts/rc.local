@@ -1,0 +1,6 @@
+#!/bin/bash
+
+for i in /sys/bus/spi/devices/spi1.*; do
+    echo 'spidev' > ${i}/driver_override
+    echo `basename ${i}` > /sys/bus/spi/drivers_probe
+done
