@@ -35,8 +35,8 @@ class CurieConfigSchema(Schema):
     f_low_lo = fields.Float()
     I0_bias = fields.Float()
     Q0_bias = fields.Float()
-    I0_bias = fields.Float()
-    Q0_bias = fields.Float()
+    I1_bias = fields.Float()
+    Q1_bias = fields.Float()
     rx0_gain = fields.Float()
     rx1_gain = fields.Float()
     tx0_gain = fields.Float()
@@ -116,6 +116,10 @@ class Curie:
         self.set_mixer_bias(1, 'I', self._config.I1_bias)
         self.set_mixer_bias(1, 'Q', self._config.Q0_bias)
 
+        self.set_gain('rx', 0, self._config.rx0_gain)
+        self.set_gain('rx', 1, self._config.rx1_gain)
+        self.set_gain('tx', 0, self._config.tx0_gain)
+        self.set_gain('tx', 1, self._config.tx1_gain)
         
         
     def load_config(self):
