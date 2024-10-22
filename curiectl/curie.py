@@ -163,6 +163,45 @@ class Curie:
         self.save_config()
 
 
+    def get_gain(self, trx, no):
+        assert trx in [ 'tx', 'rx' ]
+        assert chan in [ 0, 1 ]
+        
+        if trx == 'rx':
+            if no == 0:
+                return self._config.rx0_gain
+            elif no == 1:
+                return self._config.rx1_gain
+        else:
+            if no == 0:
+                return self._config.tx0_gain
+            elif no == 1:
+                return self._config.tx1_gain
+
+    def set_gain(self, trx, no, gain):
+        assert trx in [ 'tx', 'rx' ]
+        assert chan in [ 0, 1 ]
+
+        c = self.gain_map[(trx, no)]
+
+        V = ADRFGainTable.gain_to_voltage(gain)
+        
+        self.DAC.setV(c, V)
+        
+        if trx == 'rx':
+            if no == 0:
+                self._config.rx0_gain = gain
+            elif no == 1:
+                self._config.rx1_gain = gain
+        else:
+            if no == 0:
+                self._config.tx0_gain = gain
+            elif no == 1:
+                self._config.tx1_gain = gain
+
+        self.save_config()
+
+            
     def get_mixer_bias(self, chan, iq):
         assert chan in [ 0, 1 ]
         assert iq in [ "I", "Q" ]
@@ -177,7 +216,8 @@ class Curie:
                 return self._config.I1_bias
             elif iq == "Q":
                 return self._config.Q1_bias
-        
+
+            
     def set_mixer_bias(self, chan, iq, v):
         assert chan in [ 0, 1 ]
         assert iq in [ "I", "Q" ]

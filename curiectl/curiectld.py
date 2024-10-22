@@ -77,6 +77,16 @@ class CurieCtlService(rpyc.Service):
         print(f"Setting chan {chan} {iq} bias to {v}")
         curie.set_mixer_bias(chan, iq, v)
 
+    @rpyc.exposed
+    def get_gain(self, trx, chan):
+        return curie.get_gain(trx, chan)
+        
+    @rpyc.exposed
+    def set_gain(self, trx, chan, v):
+        print(f"Setting {trx}{chan} gain to {v}")
+        curie.set_gain(trx, chan, v)
+
+        
         
 @click.command()
 def curiectld():

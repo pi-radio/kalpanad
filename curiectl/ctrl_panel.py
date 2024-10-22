@@ -117,7 +117,7 @@ class CurieWebPanel:
             step=0.001,
             start=-0.2,
             end=0.2,
-            fixed_start= 0.2,
+            fixed_start= -0.2,
             fixed_end= 0.2,
             format="0.000",
             disabled=False,
@@ -128,7 +128,7 @@ class CurieWebPanel:
             step=0.001,
             start=-0.2,
             end=0.2,
-            fixed_start= 0.2,
+            fixed_start= -0.2,
             fixed_end= 0.2,
             format="0.000",
             disabled=False,
@@ -139,7 +139,7 @@ class CurieWebPanel:
             step=0.001,
             start=-0.2,
             end=0.2,
-            fixed_start= 0.2,
+            fixed_start= -0.2,
             fixed_end= 0.2,
             format="0.000",
             disabled=False,
@@ -148,9 +148,9 @@ class CurieWebPanel:
         TX1_Q_bias = pn.widgets.EditableFloatSlider(
             value=self.srv.get_mixer_bias(1, "Q"),
             step=0.001,
-            start= 0.2,
+            start=-0.2,
             end=0.2,
-            fixed_start= 0.2,
+            fixed_start= -0.2,
             fixed_end= 0.2,
             format="0.000",
             disabled=False,
@@ -174,7 +174,7 @@ class CurieWebPanel:
             ( "Filters", pn.Column(RX0_filter, RX1_filter, TX0_filter, TX1_filter) ),
             ( "Gain", pn.Column(RX0_gain, RX1_gain, TX0_gain, TX1_gain) ),
             ( "LO Suppression", pn.Column(TX0_I_bias, TX0_Q_bias, TX1_I_bias, TX1_Q_bias) ),
-            ( "Power", pn.Column("Dookie") )
+            ( "Power", pn.Column("Cliff Hanger") )
         )
 
     
@@ -204,6 +204,7 @@ class CurieWebPanel:
     
     def update_gain(self, channel, gain):
         print(f"Updating gain for {channel} to {gain}...")
+        self.srv.set_gain(channel[:2], int(channel[2]), gain)
 
     def update_bias(self, channel, iq, v):
         print(f"Updating bias for TX{channel} {iq} to {v}...")
