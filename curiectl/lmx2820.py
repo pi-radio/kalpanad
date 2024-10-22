@@ -78,9 +78,9 @@ class LMX2820:
             d = self.VCO_MIN / f_vco
 
             self._outa_mux = 0
-            self._chdiv = math.ceil(math.log2(d)) - 1
-            f_vco = a * 2**(self._chdiv + 1)
-            print(f"Setting chdiv to {self._chdiv} {d}")
+            self._chdiva = math.ceil(math.log2(d)) - 1
+            f_vco = a * 2**(self._chdiva + 1)
+            print(f"Setting chdiv to {self._chdiva} {d}")
         else:
             self._outa_mux = 1
             
@@ -115,12 +115,14 @@ class LMX2820:
                 self._mash_order = 3
 
         self._vco_sel = self.get_vco(f_vco)
-
+        
         self._fout = a
-                
+
+        
+        
         print(f"VCO frequency: {f_vco} VCO no: {self._vco_sel}")
         print(f"PLL: int n: {self._plln} num: {self._pll_num} den: {self._pll_den}")
-        print(f"Freq: {self.f_pfd * (self._plln + self._pll_num / self._pll_den)}")
+        print(f"Freq: {self.f_pfd * (self._plln + self._pll_num / self._pll_den) / (1 << (self._chdiva + 1))}")
 
     def get_vco(self, f):
         if f < self.VCO_LIMITS[1][0] or f > self.VCO_LIMITS[-1][1]:
