@@ -61,7 +61,12 @@ class LMX2820:
             
         return retval
 
+    @property
+    def fout(self):
+        return self._fout
+
     def set_fout(self, a, b=None):
+        print(f"Setting VCO to {a}")
         f_vco = a
         enable_doubler = False
         
@@ -110,6 +115,8 @@ class LMX2820:
                 self._mash_order = 3
 
         self._vco_sel = self.get_vco(f_vco)
+
+        self._fout = a
                 
         print(f"VCO frequency: {f_vco} VCO no: {self._vco_sel}")
         print(f"PLL: int n: {self._plln} num: {self._pll_num} den: {self._pll_den}")

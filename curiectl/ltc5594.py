@@ -127,7 +127,7 @@ class LTC5594:
             
     def read_reg(self, reg_no : int):
         assert(reg_no < 0x18)
-        r = self.spidev.xfer([ 0x80 | reg_no, 0 ])
+        r = self.spidev.transfer([ 0x80 | reg_no, 0 ])
 
         return r[1]
 
@@ -142,7 +142,3 @@ class LTC5594:
         
         return r[1]
 
-ltc5594 = [
-    LTC5594(SPI("/dev/spidev1.0", 0, 1000000))),
-    LTC5594(SPI("/dev/spidev1.1", 0, 1000000)))
-]

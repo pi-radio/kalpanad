@@ -28,7 +28,7 @@ class ADRF6520:
         self._pdn = v
         self.update()
 
-    def update(self):
+    def program(self):
         if self._cutoff == '36MHz':
             bits = 0x0
         elif self._cutoff == '72MHz':
@@ -51,7 +51,7 @@ class ADRF6520:
             
         self._spi.transfer([ 0x00, 0x10, bits ])
 
-    gain_table = [
+    gain_table = np.array([
         [ 0.   , 0.   ],
         [ 0.5  , 0.16 ],
         [ 1.   , 0.188],
@@ -173,9 +173,9 @@ class ADRF6520:
         [59.   , 1.19 ],
         [59.5  , 1.22 ],
         [60.   , 1.276]
-    ]
+    ])
 
-    gain_voltage = np.interp(gain_table[:,0], gain_table[:,1])
+    #gain_voltage = np.interp(gain_table[:,0], gain_table[:,1])
     
 
 adrf6520 = {

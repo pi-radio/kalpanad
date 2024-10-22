@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import sys
 
+from pathlib import Path
+
 import numpy as np
 
 from matplotlib.figure import Figure
@@ -16,7 +18,7 @@ class CurieWebPanel:
         self.conn = rpyc.connect('localhost', 37000)
     
         ACCENT="goldenrod"
-        LOGO="pi-radio.png"
+        LOGO="assets/pi-radio.png"
 
         data = np.random.normal(1, 1, size=100)
         fig = Figure(figsize=(8, 4))
@@ -100,7 +102,7 @@ class CurieWebPanel:
             options=filter_options)
         
         TX0_I_bias = pn.widgets.EditableFloatSlider(
-            value=0,
+            value=self.srv.get_mixer_bias(0, "I"),
             step=0.001,
             start=-0.2,
             end=0.2,
@@ -109,7 +111,7 @@ class CurieWebPanel:
             name="TX0 I bias (V)")
         
         TX0_Q_bias = pn.widgets.EditableFloatSlider(
-            value=0,
+            value=self.srv.get_mixer_bias(0, "Q"),
             step=0.001,
             start=-0.2,
             end=0.2,
@@ -118,7 +120,7 @@ class CurieWebPanel:
             name="TX0 Q bias (V)")
         
         TX1_I_bias = pn.widgets.EditableFloatSlider(
-            value=0,
+            value=self.srv.get_mixer_bias(1, "I"),
             step=0.001,
             start=-0.2,
             end=0.2,
@@ -127,7 +129,7 @@ class CurieWebPanel:
             name="TX1 I bias (V)")
         
         TX1_Q_bias = pn.widgets.EditableFloatSlider(
-            value=0,
+            value=self.srv.get_mixer_bias(1, "Q"),
             step=0.001,
             start=-0.2,
             end=0.2,
@@ -192,4 +194,4 @@ class CurieWebPanel:
 
 if __name__ == '__main__':
     p = CurieWebPanel()
-    pn.serve(p.t, show=False, port=5006)
+    pn.serve(p.t, show=False, port=5006, static_dirs={'assets': f'{Path(__file__).parent / "assets"}'})
