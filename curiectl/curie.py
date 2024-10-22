@@ -221,6 +221,7 @@ class Curie:
     def set_mixer_bias(self, chan, iq, v):
         assert chan in [ 0, 1 ]
         assert iq in [ "I", "Q" ]
+        assert v >= -0.2 and v <= 0.2
         
         c = self.iq_map[(chan, iq)]
 

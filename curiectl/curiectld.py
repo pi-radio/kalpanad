@@ -34,6 +34,20 @@ def flask_high_lo():
     return f"{curie.get_high_LO()}"
 
 
+@flask_app.route("/bias", methods=[ "GET", "PUT" ])
+def flask_bias():
+    try:
+        chan = int(request.args.get('chan'))
+        iq = request.args.get('iq')
+        v = float(request.args.get('v'))
+
+        curie.set_mixer_bias(chan, iq, v)
+    except Exception as e:
+        return f"Failed to set new bias {e}"
+    
+    return f"{curie.get_mixer_bias(0, 'I')}"
+
+
 def launch_flask():
     flask_app.run(host="0.0.0.0", port=5111)
     
