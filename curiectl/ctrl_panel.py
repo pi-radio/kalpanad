@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bwain/env python3
 import sys
 
 from pathlib import Path
@@ -30,30 +30,35 @@ class CurieWebPanel:
             '288MHz', '432MHz', '576MHz', '720MHz'
         ]
 
-    
-        low_LO = pn.widgets.EditableFloatSlider(
-            value=1,
+  
+        low_LO = pn.widgets.EditableFloatSlider( value=1,
             step=0.1,
             start=0.4,
             end=1.8,
+            fixed_start= 0.4,
+            fixed_end= 1.8,
             format="0.000000",
             disabled=False,
             name="Low LO Frequency (GHz)")
-        
+
         high_LO = pn.widgets.EditableFloatSlider(
             value=10,
             step=0.1,
             start=6.0,
             end=22.8,
+            fixed_start= 6.0,
+            fixed_end= 22.8,
             format="0.000000",
             disabled=False,
             name="High LO Frequency (GHz)")
-    
+
         RX0_gain = pn.widgets.EditableFloatSlider(
             value=32,
             step=0.1,
             start=0,
             end=60.0,
+            fixed_start= 0,
+            fixed_end= 60.0,
             format="00.0",
             disabled=False,
             name="RX0 Gain (dB)")
@@ -67,6 +72,8 @@ class CurieWebPanel:
             step=0.1,
             start=0,
             end=60.0,
+            fixed_start= 0,
+            fixed_end= 60.0,
             format="00.0",
             disabled=False,
             name="RX1 Gain (dB)")
@@ -80,6 +87,8 @@ class CurieWebPanel:
             step=0.1,
             start=0,
             end=60.0,
+            fixed_start= 0,
+            fixed_end= 60.0,
             format="00.0",
             disabled=False,
             name="TX0 Gain (dB)")
@@ -93,6 +102,8 @@ class CurieWebPanel:
             step=0.1,
             start=0,
             end=60.0,
+            fixed_start= 0,
+            fixed_end= 60,
             format="00.0",
             disabled=False,
             name="TX1 Gain (dB)")
@@ -106,6 +117,8 @@ class CurieWebPanel:
             step=0.001,
             start=-0.2,
             end=0.2,
+            fixed_start= 0.2,
+            fixed_end= 0.2,
             format="0.000",
             disabled=False,
             name="TX0 I bias (V)")
@@ -115,6 +128,8 @@ class CurieWebPanel:
             step=0.001,
             start=-0.2,
             end=0.2,
+            fixed_start= 0.2,
+            fixed_end= 0.2,
             format="0.000",
             disabled=False,
             name="TX0 Q bias (V)")
@@ -124,6 +139,8 @@ class CurieWebPanel:
             step=0.001,
             start=-0.2,
             end=0.2,
+            fixed_start= 0.2,
+            fixed_end= 0.2,
             format="0.000",
             disabled=False,
             name="TX1 I bias (V)")
@@ -131,8 +148,10 @@ class CurieWebPanel:
         TX1_Q_bias = pn.widgets.EditableFloatSlider(
             value=self.srv.get_mixer_bias(1, "Q"),
             step=0.001,
-            start=-0.2,
+            start= 0.2,
             end=0.2,
+            fixed_start= 0.2,
+            fixed_end= 0.2,
             format="0.000",
             disabled=False,
             name="TX1 Q bias (V)")
@@ -194,4 +213,4 @@ class CurieWebPanel:
 
 if __name__ == '__main__':
     p = CurieWebPanel()
-    pn.serve(p.t, show=False, port=5006, static_dirs={'assets': f'{Path(__file__).parent / "assets"}'})
+    pn.serve(p.t, show=False, port=5006)

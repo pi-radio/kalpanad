@@ -29,7 +29,7 @@ def flask_high_lo():
 
         curie.set_high_LO(new_freq)
     except Exception as e:
-        return "Failed to set new frequency"
+        return f"Failed to set new frequency {e}"
     
     return f"{curie.get_high_LO()}"
 
