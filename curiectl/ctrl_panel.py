@@ -167,20 +167,26 @@ class CurieWebPanel:
         pn.bind(self.update_bias, channel=0, iq="Q", v=TX0_Q_bias, watch=True)
         pn.bind(self.update_bias, channel=1, iq="I", v=TX1_I_bias, watch=True)
         pn.bind(self.update_bias, channel=1, iq="Q", v=TX1_Q_bias, watch=True)
+
+        links = pn.pane.Markdown("""
+        - [Help](https://www.pi-rad.io/home/contact-us)
+        """)
         
         component = pn.Accordion(
             ( "Frequency", pn.Column(low_LO, high_LO) ),
             ( "Filters", pn.Column(RX0_filter, RX1_filter, TX0_filter, TX1_filter) ),
             ( "Gain", pn.Column(RX0_gain, RX1_gain, TX0_gain, TX1_gain) ),
             ( "LO Suppression", pn.Column(TX0_I_bias, TX0_Q_bias, TX1_I_bias, TX1_Q_bias) ),
-            ( "Power", pn.Column("Cliff Hanger") )
-        )
+            ( "Power", pn.Column("Cliff Hanger") ),
+            ( "Information" , pn.Column(links) ),
+            )
 
-    
+
+        sidebar = pn.pane.image.PNG(LOGO, link_url="https://pi-rad.io/")
 
 
         self.t = pn.template.FastListTemplate(
-            title="Curie", sidebar=[LOGO], main=[component], accent=ACCENT
+            title="Curie", sidebar=[sidebar], main=[component], accent=ACCENT
         ).servable()
 
     @property
