@@ -19,7 +19,6 @@ class CurieWebPanel:
     
         ACCENT="goldenrod"
         LOGO="assets/pi-radio.png"
-
         data = np.random.normal(1, 1, size=100)
         fig = Figure(figsize=(8, 4))
         ax = fig.subplots()
@@ -214,4 +213,4 @@ class CurieWebPanel:
 
 if __name__ == '__main__':
     p = CurieWebPanel()
-    pn.serve(p.t, show=False, port=5006)
+    pn.serve(p.t, show=False, port=5006, static_dirs={'assets': f'{Path(__file__).parent/"assets"}'})
