@@ -6,6 +6,7 @@ import time
 import threading
 
 from pathlib import Path
+from json import JSONEncoder
 
 from curiectl import Curie
 from flask import Flask, request
@@ -20,32 +21,84 @@ def hello():
 
 @flask_app.route("/low_lo", methods=[ "GET", "PUT" ])
 def flask_low_lo():
-    return f"{curie.get_low_LO()}"
+    if request.method == 'POST':
+        try:
+            new_freq = float(request.args.get('freq'))
+            
+            curie.set_low_LO(new_freq)
+        except:
+            return f"Failed to set new frequency {e}"
+
+    d = { 'frequency': curie.get_low_LO() }
+        
+    return JSONEncoder().encode(d)
 
 @flask_app.route("/high_lo", methods=[ "GET", "PUT" ])
 def flask_high_lo():
-    try:
-        new_freq = float(request.args.get('freq'))
-
-        curie.set_high_LO(new_freq)
-    except Exception as e:
-        return f"Failed to set new frequency {e}"
-    
-    return f"{curie.get_high_LO()}"
+    if request.method == 'POST':
+        try:
+            new_freq = float(request.args.get('freq'))
+            
+            curie.set_high_LO(new_freq)
+        except:
+            return f"Failed to set new frequency {e}"
+        
+    d = { 'frequency': curie.get_high_LO() }
+        
+    return JSONEncoder().encode(d)
 
 
 @flask_app.route("/bias", methods=[ "GET", "PUT" ])
 def flask_bias():
-    try:
-        chan = int(request.args.get('chan'))
-        iq = request.args.get('iq')
-        v = float(request.args.get('v'))
-
-        curie.set_mixer_bias(chan, iq, v)
-    except Exception as e:
-        return f"Failed to set new bias {e}"
+    if request.method == 'POST':
+        try:
+            chan = int(request.args.get('chan'))
+            iq = request.args.get('iq')
+            v = float(request.args.get('v'))
+            
+            curie.set_mixer_bias(chan, iq, v)
+        except Exception as e:
+            return f"Failed to set new bias {e}"
+        
+    d = { 0:
+          {
+              'I': curie.get_mixer_bias(0, 'I'),
+              'Q': curie.get_mixer_bias(0, 'Q'),
+          },
+          1:
+          {
+              'I': curie.get_mixer_bias(1, 'I'),
+              'Q': curie.get_mixer_bias(1, 'Q'),
+          },
+         }
     
-    return f"{curie.get_mixer_bias(0, 'I')}"
+    return JSONEncoder().encode(d)
+
+@flask_app.route("/gain", methods=[ "GET", "PUT" ])
+def flask_gain():
+    if request.method == 'POST':
+        try:
+            trx = request.args.get('trx')
+            chan = int(request.args.get('chan'))
+            v = float(request.args.get('v'))
+            
+            curie.set_gain(trx, chan, v)
+        except Exception as e:
+            return f"Failed to set new bias {e}"
+
+    d = { 'tx':
+          {
+              0: curie.get_gain('tx', 0),
+              1: curie.get_gain('tx', 1),
+          },
+          'rx':
+          {
+              0: curie.get_gain('tx', 0),
+              1: curie.get_gain('tx', 1),
+          }
+         }
+          
+    return JSONEncoder().encode(d)
 
 
 def launch_flask():

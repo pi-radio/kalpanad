@@ -169,7 +169,7 @@ class Curie:
 
     def get_gain(self, trx, no):
         assert trx in [ 'tx', 'rx' ]
-        assert chan in [ 0, 1 ]
+        assert no in [ 0, 1 ]
         
         if trx == 'rx':
             if no == 0:
