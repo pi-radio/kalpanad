@@ -19,9 +19,9 @@ flask_app = Flask("curiectld")
 def hello():
     return "Rest API"
 
-@flask_app.route("/low_lo", methods=[ "GET", "PUT" ])
+@flask_app.route("/low_lo", methods=[ "GET", "POST", "PUT" ])
 def flask_low_lo():
-    if request.method == 'POST':
+    if 'freq' in request.args:
         try:
             new_freq = float(request.args.get('freq'))
             
@@ -33,9 +33,9 @@ def flask_low_lo():
         
     return JSONEncoder().encode(d)
 
-@flask_app.route("/high_lo", methods=[ "GET", "PUT" ])
+@flask_app.route("/high_lo", methods=[ "GET", "POST", "PUT" ])
 def flask_high_lo():
-    if request.method == 'POST':
+    if 'freq' in request.args:
         try:
             new_freq = float(request.args.get('freq'))
             
@@ -48,9 +48,9 @@ def flask_high_lo():
     return JSONEncoder().encode(d)
 
 
-@flask_app.route("/bias", methods=[ "GET", "PUT" ])
+@flask_app.route("/bias", methods=[ "GET",  "POST", "PUT" ])
 def flask_bias():
-    if request.method == 'POST':
+    if 'chan' in request.args and 'iq' in request.args and 'v' in request.args:
         try:
             chan = int(request.args.get('chan'))
             iq = request.args.get('iq')
@@ -59,6 +59,8 @@ def flask_bias():
             curie.set_mixer_bias(chan, iq, v)
         except Exception as e:
             return f"Failed to set new bias {e}"
+    elif 'chan' in request.args or 'iq' in request.args or 'v' in request.args:
+        return "bias requires 3 argumens: chan, iq and v"
         
     d = { 0:
           {
@@ -74,9 +76,9 @@ def flask_bias():
     
     return JSONEncoder().encode(d)
 
-@flask_app.route("/gain", methods=[ "GET", "PUT" ])
+@flask_app.route("/gain", methods=[ "GET",  "POST", "PUT" ])
 def flask_gain():
-    if request.method == 'POST':
+    if 'trx' in request.args and 'chan' in request.args and 'v' in request.args:
         try:
             trx = request.args.get('trx')
             chan = int(request.args.get('chan'))
@@ -85,7 +87,10 @@ def flask_gain():
             curie.set_gain(trx, chan, v)
         except Exception as e:
             return f"Failed to set new bias {e}"
+    elif 'trx' in request.args or 'chan' in request.args or 'v' in request.args:
+        return "gain requires 3 argumens: trx, iq and v"
 
+        
     d = { 'tx':
           {
               0: curie.get_gain('tx', 0),
