@@ -184,7 +184,7 @@ class Curie:
 
     def set_gain(self, trx, no, gain):
         assert trx in [ 'tx', 'rx' ]
-        assert chan in [ 0, 1 ]
+        assert no in [ 0, 1 ]
 
         c = self.gain_map[(trx, no)]
 
@@ -197,14 +197,17 @@ class Curie:
                 self._config.rx0_gain = gain
             elif no == 1:
                 self._config.rx1_gain = gain
+            else:
+                raise Exception("Invalid channel")
         else:
             if no == 0:
                 self._config.tx0_gain = gain
             elif no == 1:
                 self._config.tx1_gain = gain
+            else:
+                raise Exception("Invalid channel")
 
         self.save_config()
-
             
     def get_mixer_bias(self, chan, iq):
         assert chan in [ 0, 1 ]
@@ -245,7 +248,3 @@ class Curie:
         self.save_config()
 
 
-    def set_gain(self, trx, chan, gain):
-        c = self.gain_map[(trx, chan)]
-
-        self.DAC.setV(c, ADRFGainTable.gain_to_voltage(gain))

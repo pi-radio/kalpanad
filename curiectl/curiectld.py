@@ -86,9 +86,9 @@ def flask_gain():
             
             curie.set_gain(trx, chan, v)
         except Exception as e:
-            return f"Failed to set new bias {e}"
+            return f"Failed to set new gain {e}"
     elif 'trx' in request.args or 'chan' in request.args or 'v' in request.args:
-        return "gain requires 3 argumens: trx, iq and v"
+        return f"gain requires 3 argumens: trx, chan and v"
 
         
     d = { 'tx':
@@ -98,8 +98,8 @@ def flask_gain():
           },
           'rx':
           {
-              0: curie.get_gain('tx', 0),
-              1: curie.get_gain('tx', 1),
+              0: curie.get_gain('rx', 0),
+              1: curie.get_gain('rx', 1),
           }
          }
           
