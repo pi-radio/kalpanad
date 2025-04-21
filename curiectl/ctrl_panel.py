@@ -155,9 +155,9 @@ class CurieWebPanel:
             disabled=False,
             name="TX1 Q bias (V)")
 
-        GPIO2 = pn.widgets.Checkbox(name="GPIO2", value=self.srv.get_gpio(2))
-        GPIO3 = pn.widgets.Checkbox(name="GPIO3", value=self.srv.get_gpio(3))
-        GPIO6 = pn.widgets.Checkbox(name="GPIO6", value=self.srv.get_gpio(6))
+        GPIO2 = pn.widgets.Checkbox(name="Use Internal Reference", value=self.srv.get_gpio(2))
+        GPIO3 = pn.widgets.Checkbox(name="Use Internal Reference for Low Side", value=self.srv.get_gpio(3))
+        GPIO6 = pn.widgets.Checkbox(name="Enable 20dB Attenuator", value=self.srv.get_gpio(6))
 
         pn.bind(self.update_freq, lo="lo", freq=low_LO, watch=True)
         pn.bind(self.update_freq, lo="hi", freq=high_LO, watch=True)
@@ -186,7 +186,7 @@ class CurieWebPanel:
             ( "Gain", pn.Column(RX0_gain, RX1_gain, TX0_gain, TX1_gain) ),
             ( "LO Suppression", pn.Column(TX0_I_bias, TX0_Q_bias, TX1_I_bias, TX1_Q_bias) ),
             #( "Power", pn.Column("Cliff Hanger") ),
-            ( "GPIO", pn.Column(GPIO2, GPIO3, GPIO6) ),
+            ( "Control", pn.Column(GPIO2, GPIO3, GPIO6) ),
             ( "Information" , pn.Column(links) ),
         )
 
