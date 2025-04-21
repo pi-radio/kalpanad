@@ -114,10 +114,10 @@ class CurieWebPanel:
         TX0_I_bias = pn.widgets.EditableFloatSlider(
             value=self.srv.get_mixer_bias(0, "I"),
             step=0.001,
-            start=-0.2,
-            end=0.2,
-            fixed_start= -0.2,
-            fixed_end= 0.2,
+            start=-0.4,
+            end=0.4,
+            fixed_start= -0.4,
+            fixed_end= 0.4,
             format="0.000",
             disabled=False,
             name="TX0 I bias (V)")
@@ -125,10 +125,10 @@ class CurieWebPanel:
         TX0_Q_bias = pn.widgets.EditableFloatSlider(
             value=self.srv.get_mixer_bias(0, "Q"),
             step=0.001,
-            start=-0.2,
-            end=0.2,
-            fixed_start= -0.2,
-            fixed_end= 0.2,
+            start=-0.4,
+            end=0.4,
+            fixed_start= -0.4,
+            fixed_end= 0.4,
             format="0.000",
             disabled=False,
             name="TX0 Q bias (V)")
@@ -136,10 +136,10 @@ class CurieWebPanel:
         TX1_I_bias = pn.widgets.EditableFloatSlider(
             value=self.srv.get_mixer_bias(1, "I"),
             step=0.001,
-            start=-0.2,
-            end=0.2,
-            fixed_start= -0.2,
-            fixed_end= 0.2,
+            start=-0.4,
+            end=0.4,
+            fixed_start= -0.4,
+            fixed_end= 0.4,
             format="0.000",
             disabled=False,
             name="TX1 I bias (V)")
@@ -147,13 +147,17 @@ class CurieWebPanel:
         TX1_Q_bias = pn.widgets.EditableFloatSlider(
             value=self.srv.get_mixer_bias(1, "Q"),
             step=0.001,
-            start=-0.2,
-            end=0.2,
-            fixed_start= -0.2,
-            fixed_end= 0.2,
+            start=-0.4,
+            end=0.4,
+            fixed_start= -0.4,
+            fixed_end= 0.4,
             format="0.000",
             disabled=False,
             name="TX1 Q bias (V)")
+
+        GPIO2 = pn.widgets.Checkbox(name="GPIO2", value=self.srv.get_gpio(2))
+        GPIO3 = pn.widgets.Checkbox(name="GPIO3", value=self.srv.get_gpio(3))
+        GPIO6 = pn.widgets.Checkbox(name="GPIO6", value=self.srv.get_gpio(6))
 
         pn.bind(self.update_freq, lo="lo", freq=low_LO, watch=True)
         pn.bind(self.update_freq, lo="hi", freq=high_LO, watch=True)
@@ -168,6 +172,10 @@ class CurieWebPanel:
         pn.bind(self.update_bias, channel=1, iq="I", v=TX1_I_bias, watch=True)
         pn.bind(self.update_bias, channel=1, iq="Q", v=TX1_Q_bias, watch=True)
 
+        pn.bind(self.update_gpio, channel=2, v=GPIO2, watch=True)
+        pn.bind(self.update_gpio, channel=3, v=GPIO3, watch=True)
+        pn.bind(self.update_gpio, channel=6, v=GPIO6, watch=True)
+        
         links = pn.pane.Markdown("""
         - [Help](https://www.pi-rad.io/home/getting-started)
         """)
@@ -177,9 +185,10 @@ class CurieWebPanel:
             ( "Filters", pn.Column(RX0_filter, RX1_filter, TX0_filter, TX1_filter) ),
             ( "Gain", pn.Column(RX0_gain, RX1_gain, TX0_gain, TX1_gain) ),
             ( "LO Suppression", pn.Column(TX0_I_bias, TX0_Q_bias, TX1_I_bias, TX1_Q_bias) ),
-            ( "Power", pn.Column("Cliff Hanger") ),
+            #( "Power", pn.Column("Cliff Hanger") ),
+            ( "GPIO", pn.Column(GPIO2, GPIO3, GPIO6) ),
             ( "Information" , pn.Column(links) ),
-            )
+        )
 
 
         sidebar = pn.pane.image.PNG(LOGO, link_url="https://pi-rad.io/")
@@ -215,6 +224,9 @@ class CurieWebPanel:
         print(f"Updating bias for TX{channel} {iq} to {v}...")
         self.srv.set_mixer_bias(channel, iq, v)
 
+    def update_gpio(self, channel, v):
+        print(f"Updating GPIO {channel} to {v}...")
+        self.srv.set_gpio(channel, v)
 
 
 if __name__ == '__main__':

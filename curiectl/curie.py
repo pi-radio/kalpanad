@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from json import JSONDecodeError
 
@@ -28,7 +28,8 @@ class CurieConfig:
     Q0_bias : float = -0.071
     I1_bias : float = 0.182
     Q1_bias : float = -0.048
-    
+
+    gpio_val : dict = field(default_factory=lambda: { 2: True, 3: True, 6: True })
 
 class CurieConfigSchema(Schema):
     f_high_lo = fields.Float()
@@ -41,6 +42,7 @@ class CurieConfigSchema(Schema):
     rx1_gain = fields.Float()
     tx0_gain = fields.Float()
     tx1_gain = fields.Float()
+    gpio_val = fields.Dict(fields.Int(), fields.Bool())
 
     @post_load
     def make_config(self, data, **kwargs):
@@ -67,10 +69,12 @@ class Curie:
 
         print(self._config)
         
-        self.GPIO2 = GPIO("/dev/gpiochip0", 2, "out")
-        self.GPIO3 = GPIO("/dev/gpiochip0", 3, "out")
-        self.GPIO6 = GPIO("/dev/gpiochip0", 6, "out")
-
+        self.GPIO = {
+            2: GPIO("/dev/gpiochip0", 2, "out"),
+            3: GPIO("/dev/gpiochip0", 3, "out"),
+            6: GPIO("/dev/gpiochip0", 6, "out"),
+        }
+                
         # /dev/spidev1.0    -- LTC5594 TX0
         # /dev/spidev1.1    -- LTC5594 TX1
         # /dev/spidev1.2    -- ADRF RX0
@@ -101,10 +105,6 @@ class Curie:
 
         self.DAC = LTC2668(SPI("/dev/spidev1.8", 0, 1000000))
         
-        self.GPIO2.write(True)
-        self.GPIO3.write(True)
-        self.GPIO6.write(True)
-
         self.LO_HI.set_fout(self._config.f_high_lo)
         self.LO_HI.program()
 
@@ -120,7 +120,10 @@ class Curie:
         self.set_gain('rx', 1, self._config.rx1_gain)
         self.set_gain('tx', 0, self._config.tx0_gain)
         self.set_gain('tx', 1, self._config.tx1_gain)
-        
+
+        self.set_gpio(2, self._config.gpio_val[2])
+        self.set_gpio(3, self._config.gpio_val[3])
+        self.set_gpio(6, self._config.gpio_val[6])
         
     def load_config(self):
         if not Path("/etc/curie.conf").exists():
@@ -228,7 +231,7 @@ class Curie:
     def set_mixer_bias(self, chan, iq, v):
         assert chan in [ 0, 1 ]
         assert iq in [ "I", "Q" ]
-        assert v >= -0.2 and v <= 0.2
+        assert v >= -0.4 and v <= 0.4
         
         c = self.iq_map[(chan, iq)]
 
@@ -247,4 +250,20 @@ class Curie:
 
         self.save_config()
 
+    def get_gpio(self, channel):
+        try:
+            return self._config.gpio_val[channel]
+        except KeyError:
+            raise Exception(f"Invalid channel {channel}")
 
+    def set_gpio(self, channel, v):
+        try:
+            gpio = self.GPIO[channel]
+        except KeyError:
+            raise Exception(f"Invalid channel {channel}")
+
+        v = True if v else False
+        print(f"Saving GPIO value {channel}: {v}")
+        gpio.write(v)
+        self._config.gpio_val[channel] = v
+        self.save_config()

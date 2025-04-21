@@ -66,21 +66,21 @@ class LMX2820:
         return self._fout
 
     def set_fout(self, a, b=None):
-        print(f"Setting VCO to {a}")
+        #print(f"Setting VCO to {a}")
         f_vco = a
         enable_doubler = False
         
         if f_vco > self.VCO_MAX:
             f_vco /= 2
             self._outa_mux = 2
-            print(f"Enabling doubler {a} {f_vco}")
+            #print(f"Enabling doubler {a} {f_vco}")
         elif f_vco < self.VCO_MIN:
             d = self.VCO_MIN / f_vco
 
             self._outa_mux = 0
             self._chdiva = math.ceil(math.log2(d)) - 1
             f_vco = a * 2**(self._chdiva + 1)
-            print(f"Setting chdiv to {self._chdiva} {d}")
+            #print(f"Setting chdiv to {self._chdiva} {d}")
         else:
             self._outa_mux = 1
             
@@ -419,7 +419,7 @@ class LMX2820:
             v = r[i] | (i << 16)
             data = [ (v >> i) & 0xFF for i in [ 16, 8, 0 ] ]
             miso = self._spi.transfer(data)
-            print(f"R{i}\t0x{i:02x}{r[i]:04x}")
+            #print(f"R{i}\t0x{i:02x}{r[i]:04x}")
         
     
 if __name__ == '__main__':
