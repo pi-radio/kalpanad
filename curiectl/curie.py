@@ -164,11 +164,15 @@ class Curie:
         # TEMPORARY HACK FIX
         self.GPIO[2].write(True)
         self.GPIO[3].write(True)
+
+        time.sleep(0.01)
         
         self.LO_HI.set_fout(f)
         self.LO_HI.program()
         self._config.f_high_lo = f
 
+        time.sleep(0.01)        
+        
         self.GPIO[2].write(self._config.gpio_val[2])
         self.GPIO[3].write(self._config.gpio_val[3])
         
@@ -182,10 +186,14 @@ class Curie:
         self.GPIO[2].write(True)
         self.GPIO[3].write(True)
 
+        time.sleep(0.01)
+        
         self.LO_LO.set_fout(f)
         self.LO_LO.program()
         self._config.f_low_lo = f
 
+        time.sleep(0.01)        
+        
         self.GPIO[2].write(self._config.gpio_val[2])
         self.GPIO[3].write(self._config.gpio_val[3])
         
