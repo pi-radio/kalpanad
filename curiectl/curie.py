@@ -105,9 +105,10 @@ class Curie:
 
         self.DAC = LTC2668(SPI("/dev/spidev1.8", 0, 1000000))
 
-        # Program GPIOs first to make sure LMX has a ref clock
-        self.set_gpio(2, self._config.gpio_val[2])
-        self.set_gpio(3, self._config.gpio_val[3])
+        # Program GPIOs to use internal reference first
+        # to make sure LMX has a ref clock
+        self.set_gpio(2, True)
+        self.set_gpio(3, True)
         self.set_gpio(6, self._config.gpio_val[6])
         
         self.LO_HI.set_fout(self._config.f_high_lo)
@@ -115,6 +116,9 @@ class Curie:
 
         self.LO_LO.set_fout(self._config.f_low_lo)
         self.LO_LO.program()
+
+        self.set_gpio(2, self._config.gpio_val[2])
+        self.set_gpio(3, self._config.gpio_val[3])
 
         self.set_mixer_bias(0, 'I', self._config.I0_bias)
         self.set_mixer_bias(0, 'Q', self._config.Q0_bias)
