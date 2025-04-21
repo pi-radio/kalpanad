@@ -412,14 +412,26 @@ class LMX2820:
     def regs(self):
         return self._regs
 
+    def program_register(self, i):
+        v = self.regs[i] | (i << 16)
+        data = [ (v >> i) & 0xFF for i in [ 16, 8, 0 ] ]
+        miso = self._spi.transfer(data)
+        
+
+    def reset(self):
+        self._reset = 1
+
+        self.program_register(0)
+
+        self._reset = 0
+
+        self.program_register(0)
+        
     def program(self):
         r = self.regs
 
         for i in range(112, -1, -1):
-            v = r[i] | (i << 16)
-            data = [ (v >> i) & 0xFF for i in [ 16, 8, 0 ] ]
-            miso = self._spi.transfer(data)
-            #print(f"R{i}\t0x{i:02x}{r[i]:04x}")
+            self.program_register(i)
         
     
 if __name__ == '__main__':

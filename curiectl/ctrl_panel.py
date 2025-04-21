@@ -159,6 +159,8 @@ class CurieWebPanel:
         GPIO3 = pn.widgets.Checkbox(name="Use Internal Reference for Low Side", value=self.srv.get_gpio(3))
         GPIO6 = pn.widgets.Checkbox(name="Enable 20dB Attenuator", value=self.srv.get_gpio(6))
 
+        reset_lmx = pn.widgets.Button(name="Reset LMX", button_type="primary")
+        
         pn.bind(self.update_freq, lo="lo", freq=low_LO, watch=True)
         pn.bind(self.update_freq, lo="hi", freq=high_LO, watch=True)
 
@@ -175,6 +177,8 @@ class CurieWebPanel:
         pn.bind(self.update_gpio, channel=2, v=GPIO2, watch=True)
         pn.bind(self.update_gpio, channel=3, v=GPIO3, watch=True)
         pn.bind(self.update_gpio, channel=6, v=GPIO6, watch=True)
+
+        pn.bind(self.reset_lmx)
         
         links = pn.pane.Markdown("""
         - [Help](https://www.pi-rad.io/home/getting-started)
@@ -186,7 +190,7 @@ class CurieWebPanel:
             ( "Gain", pn.Column(RX0_gain, RX1_gain, TX0_gain, TX1_gain) ),
             ( "LO Suppression", pn.Column(TX0_I_bias, TX0_Q_bias, TX1_I_bias, TX1_Q_bias) ),
             #( "Power", pn.Column("Cliff Hanger") ),
-            ( "Control", pn.Column(GPIO2, GPIO3, GPIO6) ),
+            ( "Control", pn.Column(GPIO2, GPIO3, GPIO6, reset_lmx) ),
             ( "Information" , pn.Column(links) ),
         )
 
@@ -228,7 +232,10 @@ class CurieWebPanel:
         print(f"Updating GPIO {channel} to {v}...")
         self.srv.set_gpio(channel, v)
 
+    def reset_lmx(self):
+        self.srv.reset_lmx()
 
+        
 if __name__ == '__main__':
     p = CurieWebPanel()
     pn.serve(p.t, show=False, port=5006, static_dirs={'assets': f'{Path(__file__).parent/"assets"}'})

@@ -168,6 +168,10 @@ class CurieCtlService(rpyc.Service):
         print(f"Setting GPIO {chan} to {v}")
         curie.set_gpio(chan, v)
 
+    @rpyc.exposed
+    def reset_lmx(self, chan, v):
+        print(f"Resetting LMX(s)")
+        curie.reset_lmx()
         
         
         

@@ -273,3 +273,11 @@ class Curie:
         gpio.write(v)
         self._config.gpio_val[channel] = v
         self.save_config()
+
+    def reset_lmx(self):
+        self.LO_LO.reset()
+        self.LO_HI.reset()
+
+        self.LO_LO.program()
+        self.LO_HI.program()
+        
