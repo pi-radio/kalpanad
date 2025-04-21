@@ -160,19 +160,35 @@ class Curie:
     
     def set_high_LO(self, f):
         assert f >= 6e9 and f <= 24e9
+
+        # TEMPORARY HACK FIX
+        self.GPIO[2].write(True)
+        self.GPIO[3].write(True)
+        
         self.LO_HI.set_fout(f)
         self.LO_HI.program()
         self._config.f_high_lo = f
 
+        self.GPIO[2].write(self._config.gpio_val[2])
+        self.GPIO[3].write(self._config.gpio_val[3])
+        
         self.save_config()
 
         
     def set_low_LO(self, f):
         assert f >= 400e6 and f <= 2e9
+
+        # TEMPORARY HACK FIX
+        self.GPIO[2].write(True)
+        self.GPIO[3].write(True)
+
         self.LO_LO.set_fout(f)
         self.LO_LO.program()
         self._config.f_low_lo = f
 
+        self.GPIO[2].write(self._config.gpio_val[2])
+        self.GPIO[3].write(self._config.gpio_val[3])
+        
         self.save_config()
 
 
@@ -269,7 +285,6 @@ class Curie:
             raise Exception(f"Invalid channel {channel}")
 
         v = True if v else False
-        print(f"Saving GPIO value {channel}: {v}")
         gpio.write(v)
         self._config.gpio_val[channel] = v
         self.save_config()
