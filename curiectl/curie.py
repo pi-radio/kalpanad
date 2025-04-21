@@ -104,6 +104,11 @@ class Curie:
         self.LO_LO = LMX2820(SPI("/dev/spidev1.7", 0, 1000000), f_outa=1e9, pwra=0)
 
         self.DAC = LTC2668(SPI("/dev/spidev1.8", 0, 1000000))
+
+        # Program GPIOs first to make sure LMX has a ref clock
+        self.set_gpio(2, self._config.gpio_val[2])
+        self.set_gpio(3, self._config.gpio_val[3])
+        self.set_gpio(6, self._config.gpio_val[6])
         
         self.LO_HI.set_fout(self._config.f_high_lo)
         self.LO_HI.program()
@@ -121,9 +126,6 @@ class Curie:
         self.set_gain('tx', 0, self._config.tx0_gain)
         self.set_gain('tx', 1, self._config.tx1_gain)
 
-        self.set_gpio(2, self._config.gpio_val[2])
-        self.set_gpio(3, self._config.gpio_val[3])
-        self.set_gpio(6, self._config.gpio_val[6])
         
     def load_config(self):
         if not Path("/etc/curie.conf").exists():
