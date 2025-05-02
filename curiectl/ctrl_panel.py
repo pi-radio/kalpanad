@@ -157,7 +157,7 @@ class CurieWebPanel:
 
         GPIO2 = pn.widgets.Checkbox(name="Use Internal Reference", value=self.srv.get_gpio(2))
         GPIO3 = pn.widgets.Checkbox(name="Use Internal Reference for Low Side", value=self.srv.get_gpio(3))
-        GPIO6 = pn.widgets.Checkbox(name="Enable 20dB Attenuator", value=self.srv.get_gpio(6))
+        GPIO6 = pn.widgets.Checkbox(name="Disable Input 20dB Attenuator", value=self.srv.get_gpio(6))
 
         reset_lmx = pn.widgets.Button(name="Reset LMX", button_type="primary")
         
