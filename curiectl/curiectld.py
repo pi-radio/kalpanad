@@ -69,7 +69,7 @@ class CurieCtlService(rpyc.Service):
         return curie.get_b_LO()
 
     @rpyc.exposed
-    def get_a_LO(self, f):
+    def get_a_LO(self):
         return curie.get_a_LO()
     
     @rpyc.exposed

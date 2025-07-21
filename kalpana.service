@@ -1,0 +1,14 @@
+[Unit]
+Description=Curie Control Daemon Service
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=zapman
+ExecStart=/home/zapman/curiectld/exec.sh
+
+[Install]
+WantedBy=multi-user.target

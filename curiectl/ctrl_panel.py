@@ -25,7 +25,7 @@ class CurieWebPanel:
         ax.hist(data, bins=20, color=ACCENT)
 
         a_LO = pn.widgets.EditableFloatSlider(
-            value=1,
+            value=self.srv.get_a_LO()/1e9,
             step=0.1,
             start=0.4,
             end=4.4,
@@ -36,7 +36,7 @@ class CurieWebPanel:
             name="Frequency A (GHz)")
 
         b_LO = pn.widgets.EditableFloatSlider(
-            value=2,
+            value=self.srv.get_b_LO()/1e9,
             step=0.1,
             start=0.4,
             end=4.4,
