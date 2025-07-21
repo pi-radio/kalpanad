@@ -10,6 +10,7 @@ from pathlib import Path
 from json import JSONEncoder
 
 sys.path.insert(0, "../")
+print(f"Path: {sys.path}")
 from kalpanactl import Kalpana
 from flask import Flask, request
 
