@@ -13,7 +13,7 @@ import rpyc
 
 pn.extension(sizing_mode="stretch_width")
 
-class CurieWebPanel:
+class KalpanaWebPanel:
     def __init__(self):
         self.conn = rpyc.connect('localhost', 37000)
     
@@ -64,7 +64,7 @@ class CurieWebPanel:
 
     
         self.t = pn.template.FastListTemplate(
-            title="Curie", sidebar=[sidebar], main=[component], accent=ACCENT
+            title="Kalpana", sidebar=[sidebar], main=[component], accent=ACCENT
         ).servable()
 
     @property
@@ -90,5 +90,5 @@ class CurieWebPanel:
 
         
 if __name__ == '__main__':
-    p = CurieWebPanel()
+    p = KalpanaWebPanel()
     pn.serve(p.t, show=False, port=5006, static_dirs={'assets': f'{Path(__file__).parent/"assets"}'})

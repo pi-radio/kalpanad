@@ -16,22 +16,22 @@ from .ltc5594 import LTC5594
 
 
 @dataclass
-class CurieConfig:
+class KalpanaConfig:
     f_a_lo : float = 1e9
     f_b_lo : float = 2e9
     gpio_val : dict = field(default_factory=lambda: { 2: True, 3: True, 6: True })
 
-class CurieConfigSchema(Schema):
+class KalpanaConfigSchema(Schema):
     f_b_lo = fields.Float()
     f_a_lo = fields.Float()
     gpio_val = fields.Dict(fields.Int(), fields.Bool())
 
     @post_load
     def make_config(self, data, **kwargs):
-        return CurieConfig(**data)
+        return KalpanaConfig(**data)
     
 
-class Curie:
+class Kalpana:
    
     def __init__(self):
         self.load_config()
@@ -71,22 +71,22 @@ class Curie:
         self.set_gpio(3, self._config.gpio_val[3])
 
     def load_config(self):
-        if not Path("/etc/curie.conf").exists():
-            with open("/etc/curie.conf", "w") as f:
+        if not Path("/etc/kalpana.conf").exists():
+            with open("/etc/kalpana.conf", "w") as f:
                 print("Creating new configuration")
-                f.write(CurieConfigSchema().dumps(CurieConfig()))
+                f.write(KalpanaConfigSchema().dumps(KalpanaConfig()))
 
         try:
-            with open("/etc/curie.conf", "r") as f:
-                self._config = CurieConfigSchema().loads(f.read())
+            with open("/etc/kalpana.conf", "r") as f:
+                self._config = KalpanaConfigSchema().loads(f.read())
         except JSONDecodeError:
-            self._config = CurieConfig()
+            self._config = KalpanaConfig()
             self.save_config()
             
                 
     def save_config(self):
-        with open("/etc/curie.conf", "w") as f:
-            f.write(CurieConfigSchema().dumps(self._config))
+        with open("/etc/kalpana.conf", "w") as f:
+            f.write(KalpanaConfigSchema().dumps(self._config))
         
 
 

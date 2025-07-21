@@ -6,7 +6,7 @@ class LMX2820:
     VCO_MIN = 5.65e9
     VCO_MAX = 11.3e9
 
-    # Not a big deal for Curie out of the gate,
+    # Not a big deal for Kalpana out of the gate,
     # as the smallest N would be > 36 for any 
     # LMX we're using at 10MHz
     # With external 100MHz references this becomes an

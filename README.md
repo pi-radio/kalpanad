@@ -1,2 +1,2 @@
-# curiectld
-Control daemon for Curie board
+# kalpana
+Control daemon for Kalpana board
