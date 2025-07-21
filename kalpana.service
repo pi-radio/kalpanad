@@ -1,5 +1,5 @@
 [Unit]
-Description=Curie Control Daemon Service
+Description=Kalpana Control Daemon Service
 After=network.target
 StartLimitIntervalSec=0
 
@@ -8,7 +8,7 @@ Type=simple
 Restart=always
 RestartSec=1
 User=zapman
-ExecStart=/home/zapman/curiectld/exec.sh
+ExecStart=/home/zapman/kalpanad/exec.sh
 
 [Install]
 WantedBy=multi-user.target
