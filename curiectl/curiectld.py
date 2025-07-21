@@ -19,90 +19,32 @@ flask_app = Flask("curiectld")
 def hello():
     return "Rest API"
 
-@flask_app.route("/low_lo", methods=[ "GET", "POST", "PUT" ])
-def flask_low_lo():
+@flask_app.route("/a_lo", methods=[ "GET", "POST", "PUT" ])
+def flask_a_lo():
     if 'freq' in request.args:
         try:
             new_freq = float(request.args.get('freq'))
             
-            curie.set_low_LO(new_freq)
+            curie.set_a_LO(new_freq)
         except:
             return f"Failed to set new frequency {e}"
 
-    d = { 'frequency': curie.get_low_LO() }
+    d = { 'frequency': curie.get_a_LO() }
         
     return JSONEncoder().encode(d)
 
-@flask_app.route("/high_lo", methods=[ "GET", "POST", "PUT" ])
-def flask_high_lo():
+@flask_app.route("/b_lo", methods=[ "GET", "POST", "PUT" ])
+def flask_b_lo():
     if 'freq' in request.args:
         try:
             new_freq = float(request.args.get('freq'))
             
-            curie.set_high_LO(new_freq)
+            curie.set_b_LO(new_freq)
         except:
             return f"Failed to set new frequency {e}"
         
-    d = { 'frequency': curie.get_high_LO() }
+    d = { 'frequency': curie.get_b_LO() }
         
-    return JSONEncoder().encode(d)
-
-
-@flask_app.route("/bias", methods=[ "GET",  "POST", "PUT" ])
-def flask_bias():
-    if 'chan' in request.args and 'iq' in request.args and 'v' in request.args:
-        try:
-            chan = int(request.args.get('chan'))
-            iq = request.args.get('iq')
-            v = float(request.args.get('v'))
-            
-            curie.set_mixer_bias(chan, iq, v)
-        except Exception as e:
-            return f"Failed to set new bias {e}"
-    elif 'chan' in request.args or 'iq' in request.args or 'v' in request.args:
-        return "bias requires 3 argumens: chan, iq and v"
-        
-    d = { 0:
-          {
-              'I': curie.get_mixer_bias(0, 'I'),
-              'Q': curie.get_mixer_bias(0, 'Q'),
-          },
-          1:
-          {
-              'I': curie.get_mixer_bias(1, 'I'),
-              'Q': curie.get_mixer_bias(1, 'Q'),
-          },
-         }
-    
-    return JSONEncoder().encode(d)
-
-@flask_app.route("/gain", methods=[ "GET",  "POST", "PUT" ])
-def flask_gain():
-    if 'trx' in request.args and 'chan' in request.args and 'v' in request.args:
-        try:
-            trx = request.args.get('trx')
-            chan = int(request.args.get('chan'))
-            v = float(request.args.get('v'))
-            
-            curie.set_gain(trx, chan, v)
-        except Exception as e:
-            return f"Failed to set new gain {e}"
-    elif 'trx' in request.args or 'chan' in request.args or 'v' in request.args:
-        return f"gain requires 3 argumens: trx, chan and v"
-
-        
-    d = { 'tx':
-          {
-              0: curie.get_gain('tx', 0),
-              1: curie.get_gain('tx', 1),
-          },
-          'rx':
-          {
-              0: curie.get_gain('rx', 0),
-              1: curie.get_gain('rx', 1),
-          }
-         }
-          
     return JSONEncoder().encode(d)
 
 
@@ -123,40 +65,22 @@ class CurieCtlService(rpyc.Service):
         pass
 
     @rpyc.exposed
-    def get_high_LO(self):
-        return curie.get_high_LO()
+    def get_b_LO(self):
+        return curie.get_b_LO()
 
     @rpyc.exposed
-    def get_low_LO(self, f):
-        return curie.get_low_LO()
+    def get_a_LO(self, f):
+        return curie.get_a_LO()
     
     @rpyc.exposed
-    def set_high_LO(self, f):
-        print(f"Setting high LO to {f}")
-        curie.set_high_LO(f)
+    def set_b_LO(self, f):
+        print(f"Setting B LO to {f}")
+        curie.set_b_LO(f)
 
     @rpyc.exposed
-    def set_low_LO(self, f):
-        print(f"Setting low LO to {f}")
-        curie.set_low_LO(f)
-
-    @rpyc.exposed
-    def get_mixer_bias(self, chan, iq):
-        return curie.get_mixer_bias(chan, iq)
-        
-    @rpyc.exposed
-    def set_mixer_bias(self, chan, iq, v):
-        print(f"Setting chan {chan} {iq} bias to {v}")
-        curie.set_mixer_bias(chan, iq, v)
-
-    @rpyc.exposed
-    def get_gain(self, trx, chan):
-        return curie.get_gain(trx, chan)
-        
-    @rpyc.exposed
-    def set_gain(self, trx, chan, v):
-        print(f"Setting {trx}{chan} gain to {v}")
-        curie.set_gain(trx, chan, v)
+    def set_a_LO(self, f):
+        print(f"Setting A LO to {f}")
+        curie.set_a_LO(f)
 
     @rpyc.exposed
     def get_gpio(self, chan):
