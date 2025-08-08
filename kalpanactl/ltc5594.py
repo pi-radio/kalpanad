@@ -1,4 +1,6 @@
 from periphery import SPI
+import sys
+
 
 def reg_property(n, start_bit=0, bit_len=8):
     mask = (1 << bit_len) - 1
@@ -7,12 +9,14 @@ def reg_property(n, start_bit=0, bit_len=8):
             return (obj.regs[n] >> start_bit) & mask
 
         def __set__(self, obj, value):
+            print(f"{obj} {value:x}")
+            sys.stdout.flush()
             obj.regs[n] = (obj.regs[n] &
                            ~(mask << start_bit) |
                            ((value & mask) << start_bit))
             obj.dirty[n] = True
 
-    return reg_obj
+    return reg_obj()
                            
 class LTC5594:
     REG_LVCM_CF1 = 0x12
@@ -25,7 +29,10 @@ class LTC5594:
         self.spidev = spidev
 
         self.regs = [ self.read_reg(i) for i in range(0x18) ]
-        self.dirty = [ False ] * 0x18
+        self.dirty = [ True ] * 0x18
+
+        self.regs = [ 0 ] * 0x18
+        self._default_regs()
 
     im3qy = reg_property(0x00)
     im3qx = reg_property(0x01)
@@ -76,49 +83,136 @@ class LTC5594:
     
     def _default_regs(self):
         # Boot-up defaults
-        self._ampcc = 2
-        self._ampic = 2
-        self._ampg = 6
-        self._band = 1
-        self._cf1 = 8
-        self._cf2 = 3
-        self._dcoi = 0x80
-        self._dcoq = 0x80
-        self._eadj = 1
-        self._eamp = 1
-        self._edc = 1
-        self._edem = 1
-        self._gerr = 0x20
-        self._hd2ix = 0x80
-        self._hd2iy = 0x80
-        self._hd2qx = 0x80
-        self._hd2qy = 0x80
-        self._hd3ix = 0x80
-        self._hd3iy = 0x80
-        self._hd3qx = 0x80
-        self._hd3qy = 0x80
-        self._im2ix = 0x80
-        self._im2qx = 0x80
-        self._im3ix = 0x80
-        self._im3qx = 0x80
-        self._im3iy = 0x80
-        self._im3qy = 0x80
+        self.ampcc = 2
+        self.ampic = 2
+        self.ampg = 6
+        self.band = 1
+        self.cf1 = 8
+        self.cf2 = 3
+        self.dcoi = 0x80
+        self.dcoq = 0x80
+        self.eadj = 1
+        self.eamp = 1
+        self.edc = 1
+        self.edem = 1
+        self.gerr = 0x20
+        self.hd2ix = 0x80
+        self.hd2iy = 0x80
+        self.hd2qx = 0x80
+        self.hd2qy = 0x80
+        self.hd3ix = 0x80
+        self.hd3iy = 0x80
+        self.hd3qx = 0x80
+        self.hd3qy = 0x80
+        self.im2ix = 0x80
+        self.im2qx = 0x80
+        self.im3ix = 0x80
+        self.im3qx = 0x80
+        self.im3iy = 0x80
+        self.im3qy = 0x80
 
-        self._ip3cc = 0x02
-        self._ip3ic = 0x04
+        self.ip3cc = 0x02
+        self.ip3ic = 0x04
 
-        self._lf1 = 0x03
-        self._lvcm = 0x02
-        self._pha = 0x100
-        self._sdo_mode = 0
+        self.lf1 = 0x03
+        self.lvcm = 0x02
+        self.pha = 0x100
+        self.sdo_mode = 0
 
-    def program(self):
+    def program(self, freq):
+        print(f"LTC5594 being configured for Frequency {freq}")
+        sys.stdout.flush()
+
+        if freq < 339e6:
+            self.band = 0
+            self.cf1 = 31
+            self.lf1 = 3
+            self.cf2 = 31
+        elif freq < 398e6:
+            self.band = 0
+            self.cf1 = 21
+            self.lf1 = 3
+            self.cf2 = 24
+        elif freq < 419e6:
+            self.band = 0
+            self.cf1 = 14
+            self.lf1 = 3
+            self.cf2 = 23
+        elif freq < 556e6:
+            self.band = 0
+            self.cf1 = 17
+            self.lf1 = 2
+            self.cf2 = 31
+        elif freq < 625e6:
+            self.band = 0
+            self.cf1 = 10
+            self.lf1 = 2
+            self.cf2 = 23
+        elif freq < 801e6:
+            self.band = 0
+            self.cf1 = 15
+            self.lf1 = 1
+            self.cf2 = 31
+        elif freq < 831e6:
+            self.band = 0
+            self.cf1 = 14
+            self.lf1 = 1
+            self.cf2 = 27
+        elif freq < 1046e6:
+            self.band = 0
+            self.cf1 = 8
+            self.lf1 = 1
+            self.cf2 = 21
+        elif freq < 1242e6:
+            self.band = 1
+            self.cf1 = 31
+            self.lf1 = 3
+            self.cf2 = 31
+        elif freq < 1411e6:
+            self.band = 1
+            self.cf1 = 21
+            self.lf1 = 3
+            self.cf2 = 28
+        elif freq < 1696e6:
+            self.band = 1
+            self.cf1 = 17
+            self.lf1 = 2
+            self.cf2 = 26
+        elif freq < 2070e6:
+            self.band = 1
+            self.cf1 = 15
+            self.lf1 = 1
+            self.cf2 = 31
+        elif freq< 2470e6:
+            self.band = 1
+            self.cf1 = 8
+            self.lf1 = 1
+            self.cf2 = 21
+        elif freq < 2980e6:
+            self.band = 1
+            self.cf1 = 2
+            self.lf1 = 1
+            self.cf2 = 10
+        elif freq < 3500e6:
+            self.band = 1
+            self.cf1 = 1
+            self.lf1 = 0
+            self.cf2 = 19
+        else:
+            self.band = 1
+            self.cf1 = 0
+            self.lf1 = 0
+            self.cf2 = 0
+
+
         for i, d in enumerate(self.dirty):
             if not d:
                 continue
 
-            self.write_reg(i)
+            self.write_reg(i, check=False)
             self.dirty[i] = False
+
+        sys.stdout.flush()
                                    
     def dump_regs(self):
         for i in range(0x18):
@@ -131,14 +225,16 @@ class LTC5594:
 
         return r[1]
 
-    def write_reg(self, reg_no : int, check=True):
+    def write_reg(self, reg_no : int, check=False):
+        print(f"{reg_no:x} {self.regs[reg_no]:x}")
+        sys.stdout.flush()
         assert(reg_no < 0x18)
-        r = self.spidev.xfer([ reg_no, self.regs[reg_no] ])
+        r = self.spidev.transfer([ reg_no, self.regs[reg_no] ])
         self.dirty[reg_no] = False
 
         if check and reg_no != 0x16:
            vr = self.read_reg(reg_no)
-           assert vr == v, f"Mismatch: {reg_no:x}: sent {v:x} got {vr:x}"
+           assert vr == self.regs[reg_no], f"Mismatch: {reg_no:x}: sent {self.regs[reg_no]:x} got {vr:x}"
         
         return r[1]
 

@@ -19,13 +19,12 @@ python = "3.12"
 numpy = { file = "wheels/numpy-2.3.2-cp312-cp312-linux_armv7l.whl" }
 pandas = { file = "wheels/pandas-2.3.1-cp312-cp312-linux_armv7l.whl" }
 scipy = { file = "wheels/scipy-1.16.1-cp312-cp312-linux_armv7l.whl" }
-
-flask = "3.1.1"
-click = "8.2.1"
-rpyc = "6.0.2"
-python-periphery = "2.4.1"
-marshmallow = "4.0.0"
-
+flask = "^3.1.1"
+click = "^8.2.1"
+rpyc = "^6.0.2"
+python-periphery = "^2.4.1"
+marshmallow = "^4.0.0"
+panel = "^1.7.5"
 
 [build-system]
 requires = ["poetry-core"]

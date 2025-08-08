@@ -49,8 +49,8 @@ class Kalpana:
             LTC5594(SPI("/dev/spidev1.1", 0, 1000000))
         ]
 
-        self.ltc5594[0].program()
-        self.ltc5594[1].program()
+        self.ltc5594[0].program(self._config.f_a_lo)
+        self.ltc5594[1].program(self._config.f_b_lo)
        
         self.LO_B = LMX2820(SPI("/dev/spidev1.3", 0, 1000000), f_outa=2e9, pwra=3)
         self.LO_A = LMX2820(SPI("/dev/spidev1.2", 0, 1000000), f_outa=1e9, pwra=3)
@@ -111,6 +111,8 @@ class Kalpana:
         time.sleep(0.01)        
         self.GPIO[2].write(self._config.gpio_val[2])
         self.GPIO[3].write(self._config.gpio_val[3])
+
+        self.ltc5594[0].program(self._config.f_b_lo)
         
         self.save_config()
 
@@ -129,7 +131,9 @@ class Kalpana:
         time.sleep(0.01)        
         self.GPIO[2].write(self._config.gpio_val[2])
         self.GPIO[3].write(self._config.gpio_val[3])
-        
+
+        self.ltc5594[1].program(self._config.f_a_lo)
+
         self.save_config()
 
     def get_gpio(self, channel):
