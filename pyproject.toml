@@ -6,7 +6,7 @@ authors = ["Michael Zappe <zapman@pi-rad.io>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "3.12"
+python = ">3.12"
 
 #contourpy = { file = "wheels/contourpy-1.3.3-cp312-cp312-linux_armv7l.whl" }
 #kiwisolver = { file = "wheels/kiwisolver-1.4.8-cp312-cp312-linux_armv7l.whl" }
