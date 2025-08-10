@@ -150,6 +150,7 @@ class Kalpana:
     
     def set_b_LO(self, f):
         assert f >= 400e6 and f <= 4.4e9
+        print(f"Setting the B LO to {f}")
 
         self.GPIO[2].write(True)
         self.GPIO[3].write(True)
@@ -163,6 +164,7 @@ class Kalpana:
         self.GPIO[2].write(self._config.gpio_val[2])
         self.GPIO[3].write(self._config.gpio_val[3])
 
+        print(f"Telling the RX 5594 to configure for {f}")
         self.ltc5594[1].set_freq(self._config.f_b_lo)
         self.ltc5594[1].program()
         
@@ -171,6 +173,7 @@ class Kalpana:
         
     def set_a_LO(self, f):
         assert f >= 400e6 and f <= 4.4e9
+        print(f"Setting the A LO to {f}")
 
         self.GPIO[2].write(True)
         self.GPIO[3].write(True)
@@ -184,6 +187,7 @@ class Kalpana:
         self.GPIO[2].write(self._config.gpio_val[2])
         self.GPIO[3].write(self._config.gpio_val[3])
 
+        print(f"Telling the TX 5594 to configure for {f}")
         self.ltc5594[0].set_freq(self._config.f_a_lo)
         self.ltc5594[0].program()
 

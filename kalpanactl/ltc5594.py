@@ -209,7 +209,7 @@ class LTC5594:
     # IQ Corrections for Sideband Suppression
     def set_i_gain(self, gain):
         print(f"Sideband Suppression I Gain offset is {gain}")
-        self.gerr = int((gain + 0.5)*127) & 0x3F
+        self.gerr = int((gain + 0.5)*63) & 0x3F
 
     # IQ Corrections for Sideband Suppression
     def set_phase_offset(self, offset):
