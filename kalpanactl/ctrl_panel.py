@@ -46,8 +46,8 @@ class KalpanaWebPanel:
             disabled=False,
             name="Frequency B (GHz)")
 
-        a_i_gain = pn.widgets.EditableFloatSlider(
-            value=self.srv.get_i_gain('a'),
+        tx_i_gain = pn.widgets.EditableFloatSlider(
+            value=self.srv.get_i_gain('tx'),
             step=0.05,
             start=-0.5,
             end=0.5,
@@ -55,10 +55,10 @@ class KalpanaWebPanel:
             fixed_end= 0.5,
             format="0.00",
             disabled=False,
-            name="Channel A I over Q  gain (dB)")
+            name="Channel TX: I over Q  gain (dB) for sideband suppression")
 
-        b_i_gain = pn.widgets.EditableFloatSlider(
-            value=self.srv.get_i_gain('b'),
+        rx_i_gain = pn.widgets.EditableFloatSlider(
+            value=self.srv.get_i_gain('rx'),
             step=0.05,
             start=-0.5,
             end=0.5,
@@ -66,10 +66,10 @@ class KalpanaWebPanel:
             fixed_end= 0.5,
             format="0.00",
             disabled=False,
-            name="Channel B I over Q  gain (dB)")
+            name="Channel RX: I over Q  gain (dB) for sideband suppression")
 
-        a_i_dc_offset = pn.widgets.EditableFloatSlider(
-            value=self.srv.get_dc_offset('I', 'a'),
+        tx_i_dc_offset = pn.widgets.EditableFloatSlider(
+            value=self.srv.get_dc_offset('I', 'tx'),
             step=1,
             start=-200,
             end=200,
@@ -77,10 +77,10 @@ class KalpanaWebPanel:
             fixed_end= 200,
             format="000",
             disabled=False,
-            name="Channel A I DC offset (mV)")
+            name="Channel TX: I DC offset (mV) for LO suppression")
 
-        a_q_dc_offset = pn.widgets.EditableFloatSlider(
-            value=self.srv.get_dc_offset('Q', 'a'),
+        tx_q_dc_offset = pn.widgets.EditableFloatSlider(
+            value=self.srv.get_dc_offset('Q', 'tx'),
             step=1,
             start=-200,
             end=200,
@@ -88,10 +88,10 @@ class KalpanaWebPanel:
             fixed_end= 200,
             format="000",
             disabled=False,
-            name="Channel A Q DC offset (mV)")
+            name="Channel TX: Q DC offset (mV) for LO suppression")
 
-        b_i_dc_offset = pn.widgets.EditableFloatSlider(
-            value=self.srv.get_dc_offset('I', 'b'),
+        rx_i_dc_offset = pn.widgets.EditableFloatSlider(
+            value=self.srv.get_dc_offset('I', 'rx'),
             step=1,
             start=-200,
             end=200,
@@ -99,10 +99,10 @@ class KalpanaWebPanel:
             fixed_end= 200,
             format="000",
             disabled=False,
-            name="Channel B I DC offset (mV)")
+            name="Channel RX: I DC offset (mV) for LO suppression")
 
-        b_i_dc_offset = pn.widgets.EditableFloatSlider(
-            value=self.srv.get_dc_offset('Q', 'b'),
+        rx_q_dc_offset = pn.widgets.EditableFloatSlider(
+            value=self.srv.get_dc_offset('Q', 'rx'),
             step=1,
             start=-200,
             end=200,
@@ -110,10 +110,10 @@ class KalpanaWebPanel:
             fixed_end= 200,
             format="000",
             disabled=False,
-            name="Channel B Q DC offset (mV)")
+            name="Channel RX: Q DC offset (mV) for LO suppression")
         
-        a_phase_offset = pn.widgets.EditableFloatSlider(
-            value=self.srv.get_phase_offset('a'),
+        tx_phase_offset = pn.widgets.EditableFloatSlider(
+            value=self.srv.get_phase_offset('tx'),
             step=0.1,
             start=-2.5,
             end=2.5,
@@ -121,10 +121,10 @@ class KalpanaWebPanel:
             fixed_end= 2.5,
             format="000",
             disabled=False,
-            name="Channel A phase offset (degrees)")
+            name="Channel TX: IQ Phase offset (degrees) for sideband suppression")
         
-        b_phase_offset = pn.widgets.EditableFloatSlider(
-            value=self.srv.get_phase_offset('b'),
+        rx_phase_offset = pn.widgets.EditableFloatSlider(
+            value=self.srv.get_phase_offset('rx'),
             step=0.1,
             start=-2.5,
             end=2.5,
@@ -132,7 +132,7 @@ class KalpanaWebPanel:
             fixed_end= 2.5,
             format="000",
             disabled=False,
-            name="Channel B phase offset (degrees)")
+            name="Channel RX: IQ Phase offset (degrees) for sideband suppression")
 
 
         
@@ -146,19 +146,23 @@ class KalpanaWebPanel:
         pn.bind(self.update_freq, lo="b", freq=b_LO, watch=True)
 
 
-        pn.bind(self.update_i_gain, channel="a", v=a_i_gain, watch=True)
-        pn.bind(self.update_i_gain, channel="b", v=b_i_gain, watch=True)
+        pn.bind(self.update_i_gain, channel="tx", v=tx_i_gain, watch=True)
+        pn.bind(self.update_i_gain, channel="rx", v=rx_i_gain, watch=True)
 
-        pn.bind(self.update_dc_offset, iq='I', channel="a", v=a_i_dc_offset, watch=True)
-        pn.bind(self.update_dc_offset, iq='Q', channel="a", v=a_q_dc_offset, watch=True)
-        pn.bind(self.update_dc_offset, iq='I', channel="b", v=b_i_dc_offset, watch=True)
-        pn.bind(self.update_dc_offset, iq='Q', channel="b", v=b_q_dc_offset, watch=True)
+        pn.bind(self.update_dc_offset, iq='I', channel="tx", v=tx_i_dc_offset, watch=True)
+        pn.bind(self.update_dc_offset, iq='Q', channel="tx", v=tx_q_dc_offset, watch=True)
+        pn.bind(self.update_dc_offset, iq='I', channel="rx", v=rx_i_dc_offset, watch=True)
+        pn.bind(self.update_dc_offset, iq='Q', channel="rx", v=rx_q_dc_offset, watch=True)
 
-        pn.bind(self.update_phase_offset, channel="a", v=a_phase_offset, watch=True)
-        pn.bind(self.update_phase_offset, channel="b", v=b_phase_offset, watch=True)
+        pn.bind(self.update_phase_offset, channel="tx", v=tx_phase_offset, watch=True)
+        pn.bind(self.update_phase_offset, channel="rx", v=rx_phase_offset, watch=True)
         
         component = pn.Accordion(
-            ( "Frequency", pn.Column(a_LO, b_LO) )
+            ( "Frequency", pn.Column(a_LO, b_LO) ),
+            ( "TX-side IQ Impairments (Sideband Suppression)", pn.Column (tx_i_gain, tx_phase_offset)),
+            ( "TX-side DC Offsets (LO Suppression)", pn.Column (tx_i_dc_offset, tx_q_dc_offset)),
+            ( "RX-side IQ Impairments (Sideband Suppression)", pn.Column (rx_i_gain, rx_phase_offset)),
+            ( "RX-side DC Offsets (LO Suppression)", pn.Column (rx_i_dc_offset, rx_q_dc_offset))
         )
 
         sidebar = pn.pane.image.PNG(LOGO, link_url="https://pi-rad.io/")
@@ -171,7 +175,7 @@ class KalpanaWebPanel:
     def srv(self):
         try:
             self.conn.root.keep_alive()
-*        except EOFError:
+        except EOFError:
             self.conn = rpyc.connect('localhost', 37000)
             return self.srv
 
@@ -188,10 +192,10 @@ class KalpanaWebPanel:
         self.srv.set_i_gain(channel, v)
 
     def update_dc_offset(self, iq, channel, v):
-        self.srv.update_dc_offset(iq, channel, v)
+        self.srv.set_dc_offset(iq, channel, v)
         
     def update_phase_offset(self, channel, v):
-        self.update_phase_offset(channel, v)
+        self.srv.set_phase_offset(channel, v)
     
     def reset_lmx(self):
         self.srv.reset_lmx()

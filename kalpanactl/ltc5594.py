@@ -9,7 +9,7 @@ def reg_property(n, start_bit=0, bit_len=8):
             return (obj.regs[n] >> start_bit) & mask
 
         def __set__(self, obj, value):
-            print(f"{obj} {value:x}")
+            #print(f"{obj} {value}")
             sys.stdout.flush()
             obj.regs[n] = (obj.regs[n] &
                            ~(mask << start_bit) |
@@ -206,19 +206,26 @@ class LTC5594:
             self.lf1 = 0
             self.cf2 = 0
 
+    # IQ Corrections for Sideband Suppression
     def set_i_gain(self, gain):
-        self.gerr = (gain - 0.5) * 0x3F
+        print(f"Sideband Suppression I Gain offset is {gain}")
+        self.gerr = int((gain + 0.5)*127) & 0x3F
 
+    # IQ Corrections for Sideband Suppression
+    def set_phase_offset(self, offset):
+        print(f"Phase offset is {offset}")
+        self.phase = int((offset + 2.5) / 5 * 255) & 0xFF
+
+    # DC Offsets for LO Suppression
     def set_dc_offset(self, iq, offset):
-        code = (offset + 200) / 400 * 0xFF
+        print(f"LO Suppression DC Offset is {offset}")
+        code = int((offset + 200) / 400 * 255) & 0xFF
         
         if iq == "I":
             self.dcoi = code
         else:
             self.dcoq = code
             
-    def set_i_phase_offset(self, offset):
-        self.phase = (offset + 2.5) / 5 * 0x1FF
         
             
     def program(self):

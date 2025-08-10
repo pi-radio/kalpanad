@@ -105,7 +105,7 @@ class KalpanaCtlService(rpyc.Service):
     
     @rpyc.exposed
     def get_phase_offset(self, chan):
-        return kalpana.set_phase_offset(chan)
+        return kalpana.get_phase_offset(chan)
         
     @rpyc.exposed
     def set_i_gain(self, chan, v):
@@ -113,7 +113,7 @@ class KalpanaCtlService(rpyc.Service):
         
     @rpyc.exposed
     def set_dc_offset(self, iq, chan, v):
-        kalpana.set_i_dc_offset(iq, chan, v)
+        kalpana.set_dc_offset(iq, chan, v)
 
         
     @rpyc.exposed

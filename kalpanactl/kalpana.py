@@ -20,23 +20,35 @@ class KalpanaConfig:
     f_a_lo : float = 1e9
     f_b_lo : float = 2e9
     gpio_val : dict = field(default_factory=lambda: { 2: True, 3: True, 6: True })
-    a_i_gain : float = 0
-    b_i_gain : float = 0
-    a_i_dc_offset : float = 0
-    b_i_dc_offset : float = 0
-    a_phase_offset : float = 0
-    b_phase_offset : float = 0
     
+    # IQ Corrections for Sideband Suppression
+    tx_i_gain : float = 0
+    rx_i_gain : float = 0
+    tx_phase_offset : float = 0
+    rx_phase_offset : float = 0
+
+    # DC Offsets for LO suppression
+    tx_i_dc_offset : float = 0
+    tx_q_dc_offset : float = 0
+    rx_i_dc_offset : float = 0
+    rx_q_dc_offset : float = 0
+   
 class KalpanaConfigSchema(Schema):
     f_b_lo = fields.Float()
     f_a_lo = fields.Float()
     gpio_val = fields.Dict(fields.Int(), fields.Bool())
-    a_i_gain : fields.Float()
-    b_i_gain : fields.Float()
-    a_i_dc_offset : fields.Float()
-    b_i_dc_offset : fields.Float()
-    a_phase_offset : fields.Float()
-    b_phase_offset : fields.Float()
+
+    # IQ Corrections for Sideband Suppression
+    tx_i_gain : fields.Float()
+    rx_i_gain : fields.Float()
+    tx_phase_offset : fields.Float()
+    rx_phase_offset : fields.Float()
+
+    # DC Offsets for LO Suppression
+    tx_i_dc_offset : fields.Float()
+    tx_q_dc_offset : fields.Float()
+    rx_i_dc_offset : fields.Float()
+    rx_q_dc_offset : fields.Float()
 
     @post_load
     def make_config(self, data, **kwargs):
@@ -55,23 +67,31 @@ class Kalpana:
             3: GPIO("/dev/gpiochip0", 3, "out"),
             6: GPIO("/dev/gpiochip0", 6, "out"),
         }
-                
+        
+        # SPI 1.0 is the TX-side LTC5594
+        # SPI 1.1 is thee RX-side LTC5594
         self.ltc5594 = [
-            LTC5594(SPI("/dev/spidev1.1", 0, 1000000)),
-            LTC5594(SPI("/dev/spidev1.0", 0, 1000000))
+            LTC5594(SPI("/dev/spidev1.0", 0, 1000000)),
+            LTC5594(SPI("/dev/spidev1.1", 0, 1000000))
         ]
 
         self.ltc5594[0].set_freq(self._config.f_a_lo)
-        self.ltc5594[0].set_i_gain(self._config.a_i_gain)
-        self.ltc5594[0].set_i_dc_offset(self._config.a_i_dc_offset)
-        self.ltc5594[0].set_phase_offset(self._config.a_i_phase_offset)
+        # IQ Corrections for Sideband Suppression
+        self.ltc5594[0].set_i_gain(self._config.tx_i_gain)
+        self.ltc5594[0].set_phase_offset(self._config.tx_phase_offset)
+        # DC Offsets for LO Suppression
+        self.ltc5594[0].set_dc_offset("I", self._config.tx_i_dc_offset)
+        self.ltc5594[0].set_dc_offset("Q", self._config.tx_q_dc_offset)
         self.ltc5594[0].program()
 
         
-        self.ltc5594[0].set_freq(self._config.f_b_lo)
-        self.ltc5594[0].set_i_gain(self._config.b_i_gain)
-        self.ltc5594[0].set_i_dc_offset(self._config.b_i_dc_offset)
-        self.ltc5594[0].set_phase_offset(self._config.b_i_phase_offset)
+        self.ltc5594[1].set_freq(self._config.f_b_lo)
+        # IQ Corrections for Sideband Suppression
+        self.ltc5594[1].set_i_gain(self._config.rx_i_gain)
+        self.ltc5594[1].set_phase_offset(self._config.rx_phase_offset)
+        # DC Offsets for LO Suppression
+        self.ltc5594[1].set_dc_offset("I", self._config.rx_i_dc_offset)
+        self.ltc5594[1].set_dc_offset("Q", self._config.rx_q_dc_offset)
         self.ltc5594[1].program()
        
         self.LO_B = LMX2820(SPI("/dev/spidev1.3", 0, 1000000), f_outa=2e9, pwra=3)
@@ -118,6 +138,15 @@ class Kalpana:
 
     def get_b_LO(self):
         return self._config.f_b_lo
+
+    def get_i_gain(self, channel):
+        assert channel in ['tx', 'rx']
+
+        if channel == 'tx':
+            return self._config.tx_i_gain
+        else:
+            return self._config.rx_i_gain
+
     
     def set_b_LO(self, f):
         assert f >= 400e6 and f <= 4.4e9
@@ -160,58 +189,79 @@ class Kalpana:
 
         self.save_config()
 
-        
-    def set_I_gain(self, channel, gain):
-        assert channel in [ 'a', 'b' ]
+    # IQ Corrections for Sideband Suppression    
+    def set_i_gain(self, channel, gain):
+        assert channel in [ 'tx', 'rx' ]
         assert gain >= -0.5 and gain <= 0.5
 
-        if channel == 'a':
+        if channel == 'tx':
             ltc = self.ltc5594[0]
-            self._config.a_i_gain = gain
+            self._config.tx_i_gain = gain
         else:
             ltc = self.ltc5594[1]
-            self._config.b_i_gain = gain
+            self._config.rx_i_gain = gain
                     
         ltc.set_i_gain(gain)
         ltc.program()
-        
+
+    # IQ Corrections for Sideband Suppression
+    def set_phase_offset(self, channel, offset):
+        assert channel in [ 'tx', 'rx' ]
+        assert offset >= -2.5 and offset <= 2.5
+
+        if channel == 'tx':
+            ltc = self.ltc5594[0]
+            self._config.tx_phase_offset = offset
+        else:
+            ltc = self.ltc5594[1]
+            self._config.rx_phase_offset = offset
+                    
+        ltc.set_phase_offset(offset)
+        ltc.program()
+
+    def get_phase_offset(self, channel):
+        assert channel in ['tx', 'rx']
+        if channel == 'tx':
+            return self._config.tx_phase_offset
+        else:
+            return self._config.rx_phase_offset
+
+    # DC Offsets for LO Suppression
     def set_dc_offset(self, iq, channel, offset):
         assert iq in [ 'I', 'Q' ]
-        assert channel in [ 'a', 'b' ]
-        assert gain >= -200 and gain <= 200
+        assert channel in [ 'tx', 'rx' ]
+        assert offset >= -200 and offset <= 200
 
-        if channel == 'a':
+        if channel == 'tx':
             ltc = self.ltc5594[0]
             if iq == 'I':
-                self._config.a_i_dc_offset = offset
+                self._config.tx_i_dc_offset = offset
             else:
-                self._config.a_q_dc_offset = offset
+                self._config.tx_q_dc_offset = offset
         else:
             ltc = self.ltc5594[1]
             if iq == 'I':
-                self._config.b_i_dc_offset = offset
+                self._config.rx_i_dc_offset = offset
             else:
-                self._config.b_q_dc_offset = offset
+                self._config.rx_q_dc_offset = offset
 
         ltc.set_dc_offset(iq, offset)
             
         ltc.program()
 
-    def set_I_phase_offset(self, channel, offset):
-        assert channel in [ 'a', 'b' ]
-        assert gain >= -200 and gain <= 200
+    def get_dc_offset(self, iq, channel):
+        assert iq in ['I', 'Q']
+        assert channel in ['tx', 'rx']
 
-        if channel == 'a':
-            ltc = self.ltc5594[0]
-            self._config.a_i_phase_offset = offset
+        if iq == 'I' and channel == 'tx':
+            return self._config.tx_i_dc_offset
+        elif iq == 'I' and channel == 'rx':
+            return self._config.rx_i_dc_offset
+        elif iq == 'Q' and channel == 'tx':
+            return self._config.tx_q_dc_offset
         else:
-            ltc = self.ltc5594[1]
-            self._config.b_i_phase_offset = offset
-                    
-        ltc.set_i_phase_offset(offset)
-        ltc.program()
-
-        
+            return self._config.rx_q_dc_offset
+     
     def get_gpio(self, channel):
         try:
             return self._config.gpio_val[channel]
