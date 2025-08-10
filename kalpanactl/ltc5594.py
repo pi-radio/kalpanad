@@ -80,7 +80,9 @@ class LTC5594:
     def phase(self, v):
         self.regs[0x14] = v >> 1
         self.regs[0x15] = (self.regs[0x15] & 0x7F) | ((v & 1) << 7)
-    
+        self.dirty[0x14] = True
+        self.dirty[0x15] = True
+        
     def _default_regs(self):
         # Boot-up defaults
         self.ampcc = 2
@@ -205,13 +207,19 @@ class LTC5594:
             self.cf2 = 0
 
     def set_i_gain(self, gain):
-        pass
+        self.gerr = (gain - 0.5) * 0x3F
 
     def set_dc_offset(self, iq, offset):
-        pass
-
+        code = (offset + 200) / 400 * 0xFF
+        
+        if iq == "I":
+            self.dcoi = code
+        else:
+            self.dcoq = code
+            
     def set_i_phase_offset(self, offset):
-        pass
+        self.phase = (offset + 2.5) / 5 * 0x1FF
+        
             
     def program(self):
         for i, d in enumerate(self.dirty):
