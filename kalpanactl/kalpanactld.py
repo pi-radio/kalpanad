@@ -96,6 +96,31 @@ class KalpanaCtlService(rpyc.Service):
         kalpana.set_gpio(chan, v)
 
     @rpyc.exposed
+    def get_i_gain(self, chan):
+        return kalpana.get_i_gain(chan)
+        
+    @rpyc.exposed
+    def get_dc_offset(self, iq, chan):
+        return kalpana.get_dc_offset(iq, chan)
+    
+    @rpyc.exposed
+    def get_phase_offset(self, chan):
+        return kalpana.set_phase_offset(chan)
+        
+    @rpyc.exposed
+    def set_i_gain(self, chan, v):
+        kalpana.set_i_gain(chan, v)
+        
+    @rpyc.exposed
+    def set_dc_offset(self, iq, chan, v):
+        kalpana.set_i_dc_offset(iq, chan, v)
+
+        
+    @rpyc.exposed
+    def set_phase_offset(self, chan, v):
+        kalpana.set_phase_offset(chan, v)
+        
+    @rpyc.exposed
     def reset_lmx(self, chan, v):
         print(f"Resetting LMX(s)")
         kalpana.reset_lmx()

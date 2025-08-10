@@ -20,11 +20,23 @@ class KalpanaConfig:
     f_a_lo : float = 1e9
     f_b_lo : float = 2e9
     gpio_val : dict = field(default_factory=lambda: { 2: True, 3: True, 6: True })
-
+    a_i_gain : float = 0
+    b_i_gain : float = 0
+    a_i_dc_offset : float = 0
+    b_i_dc_offset : float = 0
+    a_phase_offset : float = 0
+    b_phase_offset : float = 0
+    
 class KalpanaConfigSchema(Schema):
     f_b_lo = fields.Float()
     f_a_lo = fields.Float()
     gpio_val = fields.Dict(fields.Int(), fields.Bool())
+    a_i_gain : fields.Float()
+    b_i_gain : fields.Float()
+    a_i_dc_offset : fields.Float()
+    b_i_dc_offset : fields.Float()
+    a_phase_offset : fields.Float()
+    b_phase_offset : fields.Float()
 
     @post_load
     def make_config(self, data, **kwargs):
@@ -45,12 +57,22 @@ class Kalpana:
         }
                 
         self.ltc5594 = [
-            LTC5594(SPI("/dev/spidev1.0", 0, 1000000)),
-            LTC5594(SPI("/dev/spidev1.1", 0, 1000000))
+            LTC5594(SPI("/dev/spidev1.1", 0, 1000000)),
+            LTC5594(SPI("/dev/spidev1.0", 0, 1000000))
         ]
 
-        self.ltc5594[0].program(self._config.f_a_lo)
-        self.ltc5594[1].program(self._config.f_b_lo)
+        self.ltc5594[0].set_freq(self._config.f_a_lo)
+        self.ltc5594[0].set_i_gain(self._config.a_i_gain)
+        self.ltc5594[0].set_i_dc_offset(self._config.a_i_dc_offset)
+        self.ltc5594[0].set_phase_offset(self._config.a_i_phase_offset)
+        self.ltc5594[0].program()
+
+        
+        self.ltc5594[0].set_freq(self._config.f_b_lo)
+        self.ltc5594[0].set_i_gain(self._config.b_i_gain)
+        self.ltc5594[0].set_i_dc_offset(self._config.b_i_dc_offset)
+        self.ltc5594[0].set_phase_offset(self._config.b_i_phase_offset)
+        self.ltc5594[1].program()
        
         self.LO_B = LMX2820(SPI("/dev/spidev1.3", 0, 1000000), f_outa=2e9, pwra=3)
         self.LO_A = LMX2820(SPI("/dev/spidev1.2", 0, 1000000), f_outa=1e9, pwra=3)
@@ -112,7 +134,8 @@ class Kalpana:
         self.GPIO[2].write(self._config.gpio_val[2])
         self.GPIO[3].write(self._config.gpio_val[3])
 
-        self.ltc5594[0].program(self._config.f_b_lo)
+        self.ltc5594[1].set_freq(self._config.f_b_lo)
+        self.ltc5594[1].program()
         
         self.save_config()
 
@@ -132,10 +155,63 @@ class Kalpana:
         self.GPIO[2].write(self._config.gpio_val[2])
         self.GPIO[3].write(self._config.gpio_val[3])
 
-        self.ltc5594[1].program(self._config.f_a_lo)
+        self.ltc5594[0].set_freq(self._config.f_a_lo)
+        self.ltc5594[0].program()
 
         self.save_config()
 
+        
+    def set_I_gain(self, channel, gain):
+        assert channel in [ 'a', 'b' ]
+        assert gain >= -0.5 and gain <= 0.5
+
+        if channel == 'a':
+            ltc = self.ltc5594[0]
+            self._config.a_i_gain = gain
+        else:
+            ltc = self.ltc5594[1]
+            self._config.b_i_gain = gain
+                    
+        ltc.set_i_gain(gain)
+        ltc.program()
+        
+    def set_dc_offset(self, iq, channel, offset):
+        assert iq in [ 'I', 'Q' ]
+        assert channel in [ 'a', 'b' ]
+        assert gain >= -200 and gain <= 200
+
+        if channel == 'a':
+            ltc = self.ltc5594[0]
+            if iq == 'I':
+                self._config.a_i_dc_offset = offset
+            else:
+                self._config.a_q_dc_offset = offset
+        else:
+            ltc = self.ltc5594[1]
+            if iq == 'I':
+                self._config.b_i_dc_offset = offset
+            else:
+                self._config.b_q_dc_offset = offset
+
+        ltc.set_dc_offset(iq, offset)
+            
+        ltc.program()
+
+    def set_I_phase_offset(self, channel, offset):
+        assert channel in [ 'a', 'b' ]
+        assert gain >= -200 and gain <= 200
+
+        if channel == 'a':
+            ltc = self.ltc5594[0]
+            self._config.a_i_phase_offset = offset
+        else:
+            ltc = self.ltc5594[1]
+            self._config.b_i_phase_offset = offset
+                    
+        ltc.set_i_phase_offset(offset)
+        ltc.program()
+
+        
     def get_gpio(self, channel):
         try:
             return self._config.gpio_val[channel]

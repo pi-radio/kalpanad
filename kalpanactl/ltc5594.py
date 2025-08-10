@@ -119,7 +119,7 @@ class LTC5594:
         self.pha = 0x100
         self.sdo_mode = 0
 
-    def program(self, freq):
+    def set_freq(self, freq):
         print(f"LTC5594 being configured for Frequency {freq}")
         sys.stdout.flush()
 
@@ -204,7 +204,16 @@ class LTC5594:
             self.lf1 = 0
             self.cf2 = 0
 
+    def set_i_gain(self, gain):
+        pass
 
+    def set_dc_offset(self, iq, offset):
+        pass
+
+    def set_i_phase_offset(self, offset):
+        pass
+            
+    def program(self):
         for i, d in enumerate(self.dirty):
             if not d:
                 continue

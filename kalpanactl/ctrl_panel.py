@@ -45,6 +45,96 @@ class KalpanaWebPanel:
             format="0.000000",
             disabled=False,
             name="Frequency B (GHz)")
+
+        a_i_gain = pn.widgets.EditableFloatSlider(
+            value=self.srv.get_i_gain('a'),
+            step=0.05,
+            start=-0.5,
+            end=0.5,
+            fixed_start= -0.5,
+            fixed_end= 0.5,
+            format="0.00",
+            disabled=False,
+            name="Channel A I over Q  gain (dB)")
+
+        b_i_gain = pn.widgets.EditableFloatSlider(
+            value=self.srv.get_i_gain('b'),
+            step=0.05,
+            start=-0.5,
+            end=0.5,
+            fixed_start= -0.5,
+            fixed_end= 0.5,
+            format="0.00",
+            disabled=False,
+            name="Channel B I over Q  gain (dB)")
+
+        a_i_dc_offset = pn.widgets.EditableFloatSlider(
+            value=self.srv.get_dc_offset('I', 'a'),
+            step=1,
+            start=-200,
+            end=200,
+            fixed_start= -200,
+            fixed_end= 200,
+            format="000",
+            disabled=False,
+            name="Channel A I DC offset (mV)")
+
+        a_q_dc_offset = pn.widgets.EditableFloatSlider(
+            value=self.srv.get_dc_offset('Q', 'a'),
+            step=1,
+            start=-200,
+            end=200,
+            fixed_start= -200,
+            fixed_end= 200,
+            format="000",
+            disabled=False,
+            name="Channel A Q DC offset (mV)")
+
+        b_i_dc_offset = pn.widgets.EditableFloatSlider(
+            value=self.srv.get_dc_offset('I', 'b'),
+            step=1,
+            start=-200,
+            end=200,
+            fixed_start= -200,
+            fixed_end= 200,
+            format="000",
+            disabled=False,
+            name="Channel B I DC offset (mV)")
+
+        b_i_dc_offset = pn.widgets.EditableFloatSlider(
+            value=self.srv.get_dc_offset('Q', 'b'),
+            step=1,
+            start=-200,
+            end=200,
+            fixed_start= -200,
+            fixed_end= 200,
+            format="000",
+            disabled=False,
+            name="Channel B Q DC offset (mV)")
+        
+        a_phase_offset = pn.widgets.EditableFloatSlider(
+            value=self.srv.get_phase_offset('a'),
+            step=0.1,
+            start=-2.5,
+            end=2.5,
+            fixed_start= -2.5,
+            fixed_end= 2.5,
+            format="000",
+            disabled=False,
+            name="Channel A phase offset (degrees)")
+        
+        b_phase_offset = pn.widgets.EditableFloatSlider(
+            value=self.srv.get_phase_offset('b'),
+            step=0.1,
+            start=-2.5,
+            end=2.5,
+            fixed_start= -2.5,
+            fixed_end= 2.5,
+            format="000",
+            disabled=False,
+            name="Channel B phase offset (degrees)")
+
+
         
         GPIO2 = pn.widgets.Checkbox(name="Use Internal Reference", value=self.srv.get_gpio(2))
         GPIO3 = pn.widgets.Checkbox(name="Use Internal Reference for Low Side", value=self.srv.get_gpio(3))
@@ -55,6 +145,17 @@ class KalpanaWebPanel:
         pn.bind(self.update_freq, lo="a", freq=a_LO, watch=True)
         pn.bind(self.update_freq, lo="b", freq=b_LO, watch=True)
 
+
+        pn.bind(self.update_i_gain, channel="a", v=a_i_gain, watch=True)
+        pn.bind(self.update_i_gain, channel="b", v=b_i_gain, watch=True)
+
+        pn.bind(self.update_dc_offset, iq='I', channel="a", v=a_i_dc_offset, watch=True)
+        pn.bind(self.update_dc_offset, iq='Q', channel="a", v=a_q_dc_offset, watch=True)
+        pn.bind(self.update_dc_offset, iq='I', channel="b", v=b_i_dc_offset, watch=True)
+        pn.bind(self.update_dc_offset, iq='Q', channel="b", v=b_q_dc_offset, watch=True)
+
+        pn.bind(self.update_phase_offset, channel="a", v=a_phase_offset, watch=True)
+        pn.bind(self.update_phase_offset, channel="b", v=b_phase_offset, watch=True)
         
         component = pn.Accordion(
             ( "Frequency", pn.Column(a_LO, b_LO) )
@@ -62,7 +163,6 @@ class KalpanaWebPanel:
 
         sidebar = pn.pane.image.PNG(LOGO, link_url="https://pi-rad.io/")
 
-    
         self.t = pn.template.FastListTemplate(
             title="Kalpana", sidebar=[sidebar], main=[component], accent=ACCENT
         ).servable()
@@ -71,7 +171,7 @@ class KalpanaWebPanel:
     def srv(self):
         try:
             self.conn.root.keep_alive()
-        except EOFError:
+*        except EOFError:
             self.conn = rpyc.connect('localhost', 37000)
             return self.srv
 
@@ -84,6 +184,14 @@ class KalpanaWebPanel:
             elif lo == "b":
                 self.srv.set_b_LO(freq * 1e9)
         
+    def update_i_gain(self, channel, v):
+        self.srv.set_i_gain(channel, v)
+
+    def update_dc_offset(self, iq, channel, v):
+        self.srv.update_dc_offset(iq, channel, v)
+        
+    def update_phase_offset(self, channel, v):
+        self.update_phase_offset(channel, v)
     
     def reset_lmx(self):
         self.srv.reset_lmx()
