@@ -48,7 +48,7 @@ class KalpanaWebPanel:
 
         tx_i_gain = pn.widgets.EditableFloatSlider(
             value=self.srv.get_i_gain('tx'),
-            step=0.05,
+            step=0.01,
             start=-0.5,
             end=0.5,
             fixed_start= -0.5,
@@ -59,7 +59,7 @@ class KalpanaWebPanel:
 
         rx_i_gain = pn.widgets.EditableFloatSlider(
             value=self.srv.get_i_gain('rx'),
-            step=0.05,
+            step=0.01,
             start=-0.5,
             end=0.5,
             fixed_start= -0.5,
@@ -119,7 +119,7 @@ class KalpanaWebPanel:
             end=2.5,
             fixed_start= -2.5,
             fixed_end= 2.5,
-            format="000",
+            format="0.00",
             disabled=False,
             name="Channel TX: IQ Phase offset (degrees) for sideband suppression")
         
@@ -130,7 +130,7 @@ class KalpanaWebPanel:
             end=2.5,
             fixed_start= -2.5,
             fixed_end= 2.5,
-            format="000",
+            format="0.00",
             disabled=False,
             name="Channel RX: IQ Phase offset (degrees) for sideband suppression")
 
